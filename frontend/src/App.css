@@ -1,0 +1,27 @@
+.app-shell {
+  min-height: 100vh;
+}
+
+.navbar {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem;
+}
+
+.navbar-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.navbar-nav a {
+  color: #1f2937;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.navbar-nav a.active {
+  color: #0f766e;
+}
+
+.app-content {
+  padding: 1.5rem;
+}
