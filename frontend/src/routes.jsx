@@ -5,6 +5,7 @@ import AboutPage from './pages/AboutPage'
 import NotFoundPage from './pages/NotFoundPage'
 import Login from './pages/Auth/LoginPage'
 import Signup from './pages/Auth/SignupPage'
+import UserDashboard from './pages/UserDashboard'
 
 
 export const router = createBrowserRouter([
@@ -31,6 +32,10 @@ export const router = createBrowserRouter([
       {
         path: '/signup',
         element: <Signup />,
+      },
+      {
+        path: '/user/dashboard',
+        element: <UserDashboard />,
       },
     ],
   },
