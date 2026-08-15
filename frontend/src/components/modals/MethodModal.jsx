@@ -38,9 +38,17 @@ export default function MethodModal({ open, onClose, purpose, onSelect }) {
               >
                 <span
                   className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-xs font-extrabold text-white"
-                  style={{ background: method.dotBg }}
+                  style={
+                    method.image
+                      ? {
+                          backgroundImage: `url(${method.image})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }
+                      : { backgroundColor: method.dotBg }
+                  }
                 >
-                  {method.dotText}
+                  {!method.image && method.dotText}
                 </span>
                 {method.label}
               </button>

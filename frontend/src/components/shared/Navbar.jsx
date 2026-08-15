@@ -37,11 +37,11 @@ export default function Navbar({
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 shrink-0">
             <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden"
+              className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
               style={{ backgroundColor: "#3D8D7A" }}
             >
               <Image
-                src="https://placehold.co/40x40/3D8D7A/FBFFE4?text=SH"
+                src="src/assets/ShareHope.png"
                 alt="ShareHope logo"
                 className="w-full h-full object-cover"
               />

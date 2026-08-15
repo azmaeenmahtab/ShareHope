@@ -41,7 +41,7 @@ export default function MobileWalletModal({ open, methodKey, onClose, onConfirm 
 
       <div className="p-6 space-y-4">
         <div className="flex flex-col gap-1 rounded-2xl border border-dashed border-emerald-300 bg-emerald-50/60 p-4 text-xs sm:text-sm text-emerald-900">
-          <span>Send to ShareHope Merchant No.</span>
+          <span>Merchant No.</span>
           <strong className="font-mono text-base font-bold text-[#3D8D7A]">01711-000000</strong>
         </div>
 
