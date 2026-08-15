@@ -36,12 +36,6 @@
       a.addEventListener("click", () => links.classList.remove("is-open"))
     );
   }
-
-  /* ---------- Footer year ---------- */
-  document.querySelectorAll("[data-year]").forEach((el) => {
-    el.textContent = new Date().getFullYear();
-  });
-
   /* ---------- Toast (global helper) ---------- */
   /* let toastTimer = null;
    window.shToast = function (message) {
