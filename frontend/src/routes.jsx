@@ -3,6 +3,9 @@ import App from './App'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import NotFoundPage from './pages/NotFoundPage'
+import Login from './pages/Auth/LoginPage'
+import Signup from './pages/Auth/SignupPage'
+
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +23,14 @@ export const router = createBrowserRouter([
       {
         path: '*',
         element: <NotFoundPage />,
+      },
+      {
+        path: '/login',
+        element: <Login />,
+      },
+      {
+        path: '/signup',
+        element: <Signup />,
       },
     ],
   },
