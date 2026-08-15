@@ -1,13 +1,15 @@
 (function () {
   "use strict";
-
-  /* ---------- demo data mirrored from the cards in the DOM ---------- */
   const CASES = {
     1: {
-      id: "SH-10432", name: "Karim Family — Winter Relief", type: "Individual", verified: true, urgent: false,
-      image: "https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=80&w=700&auto=format&fit=crop",
-      desc: "Single father of three in Mirpur needs blankets and a month's groceries after losing rickshaw work to an injury. Case verified with local imam's letter and hospital discharge note.",
-      raised: "৳ 32,000 raised", goal: "৳ 50,000", percent: 64
+      id: "SH-10432", name: "Karim Family — A warrior father", type: "Individual", verified: true, urgent: false,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbDiyQOo_Vi-ZIfF0JT3i5OJNtxe26KKchx64WxjfuNQ&s=10",
+      desc: "Single father of three in Natunbazar needs blankets and a month's groceries after losing rickshaw work to an injury. Case verified with local imam's letter and hospital discharge note.",
+      raised: "৳ 32,000 raised", goal: "৳ 50,000", percent: 64,
+      area: "Natunbazar Busstand, Dhaka", Category:"Family support",
+      submit: "03 Aug 2026", 
+      methods: "bKash, Nagad, Bank, Cash",
+      docs:["📄 NID copy", "📄 Imam letter", "📄 Hospital note"]
     },
     2: {
       id: "SH-20117", name: "Noor Widows' Trust", type: "Organization", verified: true, urgent: false,
@@ -65,7 +67,13 @@
     document.getElementById("details-bar").style.width = data.percent + "%";
     document.getElementById("details-raised").textContent = data.raised;
     document.getElementById("details-goal").textContent = data.goal;
-
+    document.getElementById("details-area").textContent = data.area;
+    document.getElementById("details-category").textContent = data.Category;
+    document.getElementById("details-submitted").textContent = data.submit;
+    document.getElementById("details-methods").textContent = data.methods;
+    document.getElementById("details-docs-1").textContent = data.docs[0] || "";
+    document.getElementById("details-docs-2").textContent = data.docs[1] || "";
+    document.getElementById("details-docs-3").textContent = data.docs[2] || "";
     const badgeWrap = document.getElementById("details-badges");
     badgeWrap.innerHTML = "";
     if (data.verified) {

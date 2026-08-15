@@ -191,7 +191,10 @@
   margin-top: 12px;
   flex-wrap: wrap;
 }
-
+.dcard__foot .badge-org{
+  background: var(--border-soft);
+  color: var(--text-soft);
+}
 @media (max-width:560px) {
   .dcard {
     flex-direction: column;
