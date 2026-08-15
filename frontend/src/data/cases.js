@@ -40,62 +40,35 @@ export const CASES = {
     docs: ["📄 Audit copy", "📄 NGO Certificate", "📄 Contact information"],
   },
   3: {
-    id: "SH-30582",
-    name: "Fahim — Emergency Dialysis",
-    type: "Individual",
-    verified: true,
-    urgent: true,
-    image:
-      "https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?q=80&w=700&auto=format&fit=crop",
-    desc:
-      "22-year-old needs immediate dialysis sessions this week; hospital has confirmed the treatment plan and provided a signed cost estimate.",
-    raised: "৳ 9,000 raised",
-    goal: "৳ 50,000",
-    percent: 18,
-    area: "Natunbazar Busstand, Dhaka",
-    category: "Family support",
-    submitted: "03 Aug 2026",
-    methods: "bKash, Nagad, Bank, Cash",
-    docs: ["📄 NID copy", "📄 Imam letter", "📄 Hospital note"],
+    id: "SH-30582", name: "Fahim — Emergency Dialysis", type: "Individual", verified: true, urgent: true,
+      image: "https://www.anera.org/wp-content/uploads/2018/10/dsc_9733_44882985711_o-edit.jpg",
+      desc: "22-year-old needs immediate dialysis sessions this week; hospital has confirmed the treatment plan and provided a signed cost estimate.",
+      raised: "৳ 9,000 raised", goal: "৳ 50,000", percent: 18,
+      area: "Mirpur-11, Dhaka", category:"Medical support",
+      submitted: "10 Aug 2026", 
+      methods: "bKash, Nagad, Bank, Cash",
+      docs:["📄 NID copy", "📄 Medical report", "📄 Hospital note"]
   },
   4: {
-    id: "SH-40261",
-    name: "Char Kukri-Mukri Flood Relief",
-    type: "Organization",
-    verified: true,
-    urgent: true,
-    image:
-      "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=700&auto=format&fit=crop",
-    desc:
-      "40 families displaced by flash flooding need clean water, tarpaulin and dry food within 72 hours. Coordinated with local union council.",
-    raised: "৳ 87,000 raised",
-    goal: "৳ 300,000",
-    percent: 29,
-    area: "Natunbazar Busstand, Dhaka",
-    category: "Family support",
-    submitted: "03 Aug 2026",
-    methods: "bKash, Nagad, Bank, Cash",
-    docs: ["📄 NID copy", "📄 Imam letter", "📄 Hospital note"],
-  },
-  5: {
-    id: "SH-11890",
-    name: "Al-Amin Orphan Care",
-    type: "Organization",
-    verified: true,
-    urgent: false,
-    image:
-      "https://images.unsplash.com/photo-1497486751825-1233686d5d80?q=80&w=700&auto=format&fit=crop",
-    desc:
-      "Runs a 60-child orphanage in Savar; monthly Zakat sponsorship covers food, tuition and healthcare for every child on record.",
-    raised: "৳ 219,000 raised",
-    goal: "৳ 300,000",
-    percent: 73,
-    area: "Natunbazar Busstand, Dhaka",
-    category: "Family support",
-    submitted: "03 Aug 2026",
-    methods: "bKash, Nagad, Bank, Cash",
-    docs: ["📄 NID copy", "📄 Imam letter", "📄 Hospital note"],
-  },
+      id: "SH-40261", name: "Flood Relief", type: "Organization", verified: false, urgent: true,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBCJpgdGo3fUVCPH-D2U0RMHe14oFSlZyFzP92OvaxxtIZ_WjnZ5L1Nao&s=10",
+      desc: "40 families displaced by flash flooding need clean water, tarpaulin and dry food within 72 hours. Coordinated with local union council.",
+      raised: "৳ 87,000 raised", goal: "৳ 300,000", percent: 29,
+      area: "Moheshkhali, Chittagong", category:"Disaster support",
+      submitted: "11 Aug 2026", 
+      methods: "bKash, Nagad, Bank, Cash",
+      docs:["📄 Verification Photos", "📄 Council Approval", "📄 Distribution details"]
+    },
+    5: {
+      id: "SH-11890", name: "As-Sunnah foundation", type: "Organization", verified: true, urgent: false,
+      image: "https://images.seeklogo.com/logo-png/54/2/as-sunnah-foundation-logo-png_seeklogo-549763.png",
+      desc: "Supporting underprivileged people with essential supplies and resources.",
+      raised: "৳ 219,000 raised", goal: "৳ 300,000", percent: 73,
+      area: "Badda, Dhaka", category:"Humanitarian support",
+      submitted: "25 Jul 2026", 
+      methods: "bKash, Nagad, Bank, Cash",
+      docs:["📄 Project plans", "📄 Organization Certificate", "📄 NGO License"]
+    }
 };
 
 // Which cases render under each filterable category section, in order.
@@ -136,9 +109,9 @@ export const CHIPS = [
 
 // Payment method tiles shown in the "choose payment method" modal.
 export const WALLET_METHODS = {
-  bkash: { label: "bKash", dotBg: "#e2136e", dotText: "bK" },
-  nagad: { label: "Nagad", dotBg: "#f6921e", dotText: "N" },
-  rocket: { label: "Rocket", dotBg: "#8c3494", dotText: "R" },
+  bkash: { label: "bKash", image:"https://yt3.googleusercontent.com/ytc/AIdro_kfgKlp22w3_zZbhHhYhc279q-rVbYRMy1xZ8gJMZRcsQ=s900-c-k-c0x00ffffff-no-rj"},
+  nagad: { label: "Nagad", image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ7OT_O7Ocrh1xRG5vMM3ki5rlWPi8UvhFtNHqGBlhXmTNdDEMxUmipxcE&s=10"},
+  rocket: { label: "Rocket", image:"https://play-lh.googleusercontent.com/hcRpk0BWUTNPwr1bRWzNVKGZd2lbtdtNS9d__2w6glKwAUE_xvTh8FjkipEnzrlbEVCGsQ-75UwA5HRAYzHEdw"},
 };
 
 export const OFFLINE_METHODS = {
@@ -147,13 +120,13 @@ export const OFFLINE_METHODS = {
     dotBg: "#1e293b",
     dotText: "🏦",
     line1: "Bank · Account name",
-    line2: "ShareHope Foundation — A/C 2011 5567 002",
+    line2: "A/C 2011 5567 002",
   },
   cash: {
     label: "Cash",
     dotBg: "#3D8D7A",
     dotText: "৳",
     line1: "Hand-to-hand collection",
-    line2: "A verified collector will contact you to arrange pickup",
+    line2: "The donee will contact you to arrange pickup",
   },
 };
