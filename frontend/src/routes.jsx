@@ -5,7 +5,7 @@ import AboutPage from './pages/AboutPage'
 import NotFoundPage from './pages/NotFoundPage'
 import Login from './pages/Auth/LoginPage'
 import Signup from './pages/Auth/SignupPage'
-import UserDashboard from './pages/UserDashboard'
+ import Requests from './pages/Requests'
 
 
 export const router = createBrowserRouter([
@@ -34,8 +34,8 @@ export const router = createBrowserRouter([
         element: <Signup />,
       },
       {
-        path: '/user/dashboard',
-        element: <UserDashboard />,
+        path: '/requests',
+        element: <Requests />,
       },
     ],
   },
