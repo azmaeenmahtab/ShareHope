@@ -6,7 +6,7 @@ function App() {
   return (
     <div className="app-shell">
       <Navbar />
-      <main className="app-content">
+      <main>
         <Outlet />
       </main>
     </div>

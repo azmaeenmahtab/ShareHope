@@ -1,10 +1,15 @@
-function HomePage() {
+import HeroSection from "../components/Home/Hero";
+
+export default function HomePage() {
   return (
-    <section>
-      <h1>Share Hope</h1>
-      <p>Welcome to the home page.</p>
-    </section>
+    <div>
+      <div>
+        <HeroSection />
+      </div>
+
+      {/* features section */}
+    </div>
   )
 }
 
-export default HomePage
+
