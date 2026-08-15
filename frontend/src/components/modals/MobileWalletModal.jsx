@@ -24,29 +24,29 @@ export default function MobileWalletModal({ open, methodKey, onClose, onConfirm 
 
   return (
     <Overlay open={open} onClose={onClose}>
-      <div className="sticky top-0 z-[2] flex items-center justify-between gap-3 border-b border-[var(--border-soft)] bg-[var(--bg-raised)] px-[22px] py-[18px]">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-6 py-4">
         <div>
-          <span className="mb-0.5 block text-[11.5px] font-bold uppercase tracking-[.08em] text-[var(--accent)]">{label}</span>
-          <h3 className="text-lg font-display font-semibold text-[var(--text-strong)]">Payment details</h3>
+          <span className="mb-0.5 block text-xs font-bold uppercase tracking-wider text-[#3D8D7A]">{label}</span>
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900">Payment details</h3>
         </div>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-sunken)] text-[var(--text-soft)] hover:border-[var(--danger-600)] hover:text-[var(--danger-600)]"
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 hover:border-red-300 hover:bg-red-50 hover:text-red-600 transition-all"
         >
           <CloseIcon />
         </button>
       </div>
 
-      <div className="p-[22px]">
-        <div className="mb-[18px] flex flex-col gap-1 rounded-2xl border border-dashed border-[var(--border)] bg-[var(--bg-sunken)] px-4 py-3.5 text-[13px] text-[var(--text-soft)]">
+      <div className="p-6 space-y-4">
+        <div className="flex flex-col gap-1 rounded-2xl border border-dashed border-emerald-300 bg-emerald-50/60 p-4 text-xs sm:text-sm text-emerald-900">
           <span>Send to ShareHope Merchant No.</span>
-          <strong className="font-mono text-[15px] text-[var(--accent-strong)]">01711-000000</strong>
+          <strong className="font-mono text-base font-bold text-[#3D8D7A]">01711-000000</strong>
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="wallet-number" className="mb-[7px] block text-[12.5px] font-bold uppercase tracking-[.04em] text-[var(--text-soft)]">
+        <div>
+          <label htmlFor="wallet-number" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
             Your {label} number
           </label>
           <input
@@ -56,13 +56,13 @@ export default function MobileWalletModal({ open, methodKey, onClose, onConfirm 
             value={number}
             onChange={(e) => setNumber(e.target.value)}
             placeholder="01XXXXXXXXX"
-            className="w-full rounded-xl border-[1.5px] border-[var(--border)] bg-[var(--bg-sunken)] px-3.5 py-3 text-[14.5px] text-[var(--text-strong)] focus:border-[var(--accent)] focus:bg-[var(--bg-raised)] focus:outline-none"
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 focus:border-[#3D8D7A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3D8D7A]/20 transition-all"
           />
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
-            <label htmlFor="wallet-txnid" className="mb-[7px] block text-[12.5px] font-bold uppercase tracking-[.04em] text-[var(--text-soft)]">
+            <label htmlFor="wallet-txnid" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
               Transaction ID
             </label>
             <input
@@ -71,11 +71,11 @@ export default function MobileWalletModal({ open, methodKey, onClose, onConfirm 
               value={txnId}
               onChange={(e) => setTxnId(e.target.value)}
               placeholder="e.g. 9GD4K2LQ"
-              className="w-full rounded-xl border-[1.5px] border-[var(--border)] bg-[var(--bg-sunken)] px-3.5 py-3 text-[14.5px] text-[var(--text-strong)] focus:border-[var(--accent)] focus:bg-[var(--bg-raised)] focus:outline-none"
+              className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 focus:border-[#3D8D7A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3D8D7A]/20 transition-all"
             />
           </div>
           <div className="flex-1">
-            <label htmlFor="wallet-amount" className="mb-[7px] block text-[12.5px] font-bold uppercase tracking-[.04em] text-[var(--text-soft)]">
+            <label htmlFor="wallet-amount" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
               Amount (৳)
             </label>
             <input
@@ -84,18 +84,18 @@ export default function MobileWalletModal({ open, methodKey, onClose, onConfirm 
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="1,000"
-              className="w-full rounded-xl border-[1.5px] border-[var(--border)] bg-[var(--bg-sunken)] px-3.5 py-3 text-[14.5px] text-[var(--text-strong)] focus:border-[var(--accent)] focus:bg-[var(--bg-raised)] focus:outline-none"
+              className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 focus:border-[#3D8D7A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3D8D7A]/20 transition-all"
             />
           </div>
         </div>
 
-        <div className="mt-4">
-          <label className="mb-[7px] block text-[12.5px] font-bold uppercase tracking-[.04em] text-[var(--text-soft)]">
-            Screenshot of transaction <span className="font-normal normal-case text-[var(--text-soft)]">(optional)</span>
+        <div>
+          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
+            Screenshot of transaction <span className="font-normal normal-case text-slate-400">(optional)</span>
           </label>
           <label
             htmlFor="wallet-file"
-            className="flex cursor-pointer flex-col items-center gap-1.5 rounded-2xl border-[1.5px] border-dashed border-[var(--border)] bg-[var(--bg-sunken)] p-[18px] text-center text-[13px] text-[var(--text-soft)] hover:border-[var(--accent)] hover:text-[var(--accent-strong)]"
+            className="flex cursor-pointer flex-col items-center gap-1.5 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 text-center text-xs sm:text-sm text-slate-600 hover:border-[#3D8D7A] hover:text-[#3D8D7A] hover:bg-emerald-50/20 transition-all"
           >
             <UploadIcon />
             <span>{fileName || "Tap to upload a screenshot"}</span>
@@ -110,11 +110,11 @@ export default function MobileWalletModal({ open, methodKey, onClose, onConfirm 
         </div>
       </div>
 
-      <div className="px-[22px] pb-[22px] pt-4">
+      <div className="border-t border-slate-100 px-6 py-4 bg-slate-50/50">
         <button
           type="button"
           onClick={onConfirm}
-          className="w-full rounded-full bg-gradient-to-br from-[var(--leaf-600)] to-[var(--trunk-800)] px-5 py-[11px] text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(23,90,146,.6)] active:scale-[.97]"
+          className="w-full rounded-full bg-[#3D8D7A] hover:bg-[#2b6658] px-5 py-3 text-sm font-semibold text-white shadow-md active:scale-95 transition-all"
         >
           Confirm payment
         </button>

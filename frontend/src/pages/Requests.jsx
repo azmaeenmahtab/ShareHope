@@ -1,6 +1,4 @@
 import { useMemo, useRef, useState } from "react";
-import useTheme from "../hooks/useTheme";
-import Navbar from "../components/shared/Navbar";
 import Footer from "../components/shared/Footer";
 import SearchHero from "../components/SearchHero";
 import CategorySection from "../components/CategorySection";
@@ -13,9 +11,8 @@ import SimpleModal from "../components/modals/SimpleModal";
 import SuccessModal from "../components/modals/SuccessModal";
 import { CASES, SECTIONS, WALLET_METHODS } from "../data/cases";
 
-export default function UserDashboard() {
-  const { theme, toggleTheme } = useTheme();
-
+export default function Requests() {
+ 
   // Search + category filter
   const [query, setQuery] = useState("");
   const [activeChip, setActiveChip] = useState("all");
@@ -30,6 +27,7 @@ export default function UserDashboard() {
   const [successOpen, setSuccessOpen] = useState(false);
 
   const [toastMessage, setToastMessage] = useState(null);
+
   const toastTimer = useRef(null);
 
   const showToast = (message) => {
@@ -92,8 +90,7 @@ export default function UserDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] font-body text-[15.5px] leading-[1.55] text-[var(--text)]">
-      <Navbar theme={theme} onToggleTheme={toggleTheme} />
+    <div className="min-h-screen bg-[#FAF9F5] font-sans text-slate-800 leading-relaxed">
 
       <main className="mx-auto max-w-[1080px] px-6 pb-5 pt-9">
         <SearchHero

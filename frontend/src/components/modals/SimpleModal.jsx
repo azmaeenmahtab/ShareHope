@@ -14,31 +14,31 @@ export default function SimpleModal({ open, methodKey, onClose, onConfirm }) {
 
   return (
     <Overlay open={open} onClose={onClose}>
-      <div className="sticky top-0 z-[2] flex items-center justify-between gap-3 border-b border-[var(--border-soft)] bg-[var(--bg-raised)] px-[22px] py-[18px]">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-6 py-4">
         <div>
-          <span className="mb-0.5 block text-[11.5px] font-bold uppercase tracking-[.08em] text-[var(--accent)]">
+          <span className="mb-0.5 block text-xs font-bold uppercase tracking-wider text-[#3D8D7A]">
             {method?.label}
           </span>
-          <h3 className="text-lg font-display font-semibold text-[var(--text-strong)]">Payment details</h3>
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900">Payment details</h3>
         </div>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-sunken)] text-[var(--text-soft)] hover:border-[var(--danger-600)] hover:text-[var(--danger-600)]"
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 hover:border-red-300 hover:bg-red-50 hover:text-red-600 transition-all"
         >
           <CloseIcon />
         </button>
       </div>
 
-      <div className="p-[22px]">
-        <div className="mb-[18px] flex flex-col gap-1 rounded-2xl border border-dashed border-[var(--border)] bg-[var(--bg-sunken)] px-4 py-3.5 text-[13px] text-[var(--text-soft)]">
+      <div className="p-6 space-y-4">
+        <div className="flex flex-col gap-1 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-xs sm:text-sm text-slate-700">
           <span>{method?.line1}</span>
-          <strong className="text-[var(--accent-strong)]">{method?.line2}</strong>
+          <strong className="text-sm sm:text-base font-bold text-[#3D8D7A]">{method?.line2}</strong>
         </div>
 
         <div>
-          <label htmlFor="simple-amount" className="mb-[7px] block text-[12.5px] font-bold uppercase tracking-[.04em] text-[var(--text-soft)]">
+          <label htmlFor="simple-amount" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
             Amount (৳)
           </label>
           <input
@@ -47,16 +47,16 @@ export default function SimpleModal({ open, methodKey, onClose, onConfirm }) {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="1,000"
-            className="w-full rounded-xl border-[1.5px] border-[var(--border)] bg-[var(--bg-sunken)] px-3.5 py-3 text-[14.5px] text-[var(--text-strong)] focus:border-[var(--accent)] focus:bg-[var(--bg-raised)] focus:outline-none"
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 focus:border-[#3D8D7A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3D8D7A]/20 transition-all"
           />
         </div>
       </div>
 
-      <div className="px-[22px] pb-[22px] pt-4">
+      <div className="border-t border-slate-100 px-6 py-4 bg-slate-50/50">
         <button
           type="button"
           onClick={onConfirm}
-          className="w-full rounded-full bg-gradient-to-br from-[var(--leaf-600)] to-[var(--trunk-800)] px-5 py-[11px] text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(23,90,146,.6)] active:scale-[.97]"
+          className="w-full rounded-full bg-[#3D8D7A] hover:bg-[#2b6658] px-5 py-3 text-sm font-semibold text-white shadow-md active:scale-95 transition-all"
         >
           Confirm payment
         </button>

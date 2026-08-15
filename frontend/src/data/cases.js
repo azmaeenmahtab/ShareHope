@@ -144,14 +144,14 @@ export const WALLET_METHODS = {
 export const OFFLINE_METHODS = {
   bank: {
     label: "Bank transfer",
-    dotBg: "var(--trunk-800)",
+    dotBg: "#1e293b",
     dotText: "🏦",
     line1: "Bank · Account name",
     line2: "ShareHope Foundation — A/C 2011 5567 002",
   },
   cash: {
     label: "Cash",
-    dotBg: "var(--leaf-600)",
+    dotBg: "#3D8D7A",
     dotText: "৳",
     line1: "Hand-to-hand collection",
     line2: "A verified collector will contact you to arrange pickup",

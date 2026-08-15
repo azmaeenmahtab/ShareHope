@@ -13,7 +13,7 @@ import { Bell, ChevronDown, LogOut, User, LayoutDashboard, Menu, X } from "lucid
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Browse Requests", href: "/donation-requests" },
+  { label: "Browse Requests", href: "/requests" },
   { label: "Zakat Calculator", href: "/zakat-calculator" },
   { label: "About", href: "/about" },
 ];

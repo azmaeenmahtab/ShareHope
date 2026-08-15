@@ -15,33 +15,33 @@ export default function ReportModal({ open, onClose, onSubmit }) {
 
   return (
     <Overlay open={open} onClose={onClose}>
-      <div className="sticky top-0 z-[2] flex items-center justify-between gap-3 border-b border-[var(--border-soft)] bg-[var(--bg-raised)] px-[22px] py-[18px]">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-6 py-4">
         <div>
-          <span className="mb-0.5 block text-[11.5px] font-bold uppercase tracking-[.08em] text-[var(--accent)]">
+          <span className="mb-0.5 block text-xs font-bold uppercase tracking-wider text-red-600">
             Keep ShareHope honest
           </span>
-          <h3 className="text-lg font-display font-semibold text-[var(--text-strong)]">Report this request</h3>
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900">Report this request</h3>
         </div>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-sunken)] text-[var(--text-soft)] hover:border-[var(--danger-600)] hover:text-[var(--danger-600)]"
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 hover:border-red-300 hover:bg-red-50 hover:text-red-600 transition-all"
         >
           <CloseIcon />
         </button>
       </div>
 
-      <div className="p-[22px]">
-        <div className="mb-4">
-          <label htmlFor="report-reason" className="mb-[7px] block text-[12.5px] font-bold uppercase tracking-[.04em] text-[var(--text-soft)]">
+      <div className="p-6 space-y-4">
+        <div>
+          <label htmlFor="report-reason" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
             Reason
           </label>
           <select
             id="report-reason"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            className="w-full rounded-xl border-[1.5px] border-[var(--border)] bg-[var(--bg-sunken)] px-3.5 py-3 text-[14.5px] text-[var(--text-strong)] focus:border-[var(--accent)] focus:bg-[var(--bg-raised)] focus:outline-none"
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 focus:border-[#3D8D7A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3D8D7A]/20 transition-all"
           >
             {REASONS.map((r) => (
               <option key={r}>{r}</option>
@@ -50,31 +50,31 @@ export default function ReportModal({ open, onClose, onSubmit }) {
         </div>
 
         <div>
-          <label htmlFor="report-notes" className="mb-[7px] block text-[12.5px] font-bold uppercase tracking-[.04em] text-[var(--text-soft)]">
-            Additional explanation <span className="font-normal normal-case text-[var(--text-soft)]">(optional)</span>
+          <label htmlFor="report-notes" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
+            Additional explanation <span className="font-normal normal-case text-slate-400">(optional)</span>
           </label>
           <textarea
             id="report-notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Tell the admin team what you noticed…"
-            className="min-h-[88px] w-full resize-y rounded-xl border-[1.5px] border-[var(--border)] bg-[var(--bg-sunken)] px-3.5 py-3 text-[14.5px] text-[var(--text-strong)] focus:border-[var(--accent)] focus:bg-[var(--bg-raised)] focus:outline-none"
+            className="min-h-[90px] w-full resize-y rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 focus:border-[#3D8D7A] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3D8D7A]/20 transition-all"
           />
         </div>
       </div>
 
-      <div className="flex gap-2.5 px-[22px] pb-[22px] pt-4">
+      <div className="flex gap-3 border-t border-slate-100 px-6 py-4 bg-slate-50/50">
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-[var(--border)] bg-[var(--bg-sunken)] px-5 py-[11px] text-sm font-semibold text-[var(--accent-strong)] hover:border-[var(--accent)] hover:bg-[var(--bg-raised)]"
+          className="flex-1 rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-all"
         >
           Cancel
         </button>
         <button
           type="button"
           onClick={handleSubmit}
-          className="flex-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[var(--danger-600)] px-5 py-[11px] text-sm font-semibold text-white active:scale-[.97]"
+          className="flex-1 rounded-full bg-red-600 hover:bg-red-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all active:scale-95"
         >
           Submit report
         </button>
