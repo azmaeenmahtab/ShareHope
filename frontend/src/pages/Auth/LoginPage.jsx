@@ -49,6 +49,7 @@ export default function Login() {
       // TODO: store result.data.accessToken (memory/state) and redirect
       // e.g. navigate("/dashboard")
       console.log("Login success:", result);
+      navigate("/requests");
     } catch (err) {
       setError(err.message);
     } finally {

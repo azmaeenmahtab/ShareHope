@@ -6,6 +6,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import Login from './pages/Auth/LoginPage'
 import Signup from './pages/Auth/SignupPage'
  import Requests from './pages/Requests'
+import DonationRequestPage from './pages/DonationRequestPage'
 
 
 export const router = createBrowserRouter([
@@ -36,6 +37,10 @@ export const router = createBrowserRouter([
       {
         path: '/requests',
         element: <Requests />,
+      },
+      {
+        path: '/donation-request',
+        element: <DonationRequestPage />,
       },
     ],
   },
