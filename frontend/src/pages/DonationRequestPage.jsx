@@ -106,6 +106,7 @@ export default function DonationRequestPage() {
   const [submittedData, setSubmittedData] = useState(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [toastMsg, setToastMsg] = useState(null);
+  const [name, setName] = useState("")
 
   const triggerToast = (msg) => {
     setToastMsg(msg);
@@ -177,7 +178,7 @@ export default function DonationRequestPage() {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
     if (!validate()) {
       triggerToast("Please fill in all required fields marked in red.");
       return;
@@ -206,27 +207,27 @@ export default function DonationRequestPage() {
   };
 
   // Preview object for DetailsModal and Live Card
-  const previewCase = {
-    id: submittedData ? submittedData.id : "SH-PREVIEW",
-    name: formData.name || "Recipient / Request Title",
-    type: formData.type,
-    verified: false,
-    urgent: formData.urgent,
-    image:
-      formData.image ||
-      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=700&auto=format&fit=crop",
-    desc:
-      formData.desc ||
-      "Provide details about the cause, family background, medical condition, or urgent need to help donors understand your request.",
-    raised: "৳ 0 raised",
-    goal: formData.goal ? `৳ ${Number(formData.goal).toLocaleString("en-IN")}` : "৳ 50,000",
-    percent: 0,
-    area: formData.area || "Area / Location (e.g. Natunbazar, Dhaka)",
-    category: formData.category,
-    submitted: "Pending Verification",
-    methods: formData.methods.length > 0 ? formData.methods.join(", ") : "bKash, Nagad, Bank, Cash",
-    docs: formData.docs.length > 0 ? formData.docs : ["📄 Pending verification"],
-  };
+  // const previewCase = {
+  //   id: submittedData ? submittedData.id : "SH-PREVIEW",
+  //   name: formData.name || "Recipient / Request Title",
+  //   type: formData.type,
+  //   verified: false,
+  //   urgent: formData.urgent,
+  //   image:
+  //     formData.image ||
+  //     "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=700&auto=format&fit=crop",
+  //   desc:
+  //     formData.desc ||
+  //     "Provide details about the cause, family background, medical condition, or urgent need to help donors understand your request.",
+  //   raised: "৳ 0 raised",
+  //   goal: formData.goal ? `৳ ${Number(formData.goal).toLocaleString("en-IN")}` : "৳ 50,000",
+  //   percent: 0,
+  //   area: formData.area || "Area / Location (e.g. Natunbazar, Dhaka)",
+  //   category: formData.category,
+  //   submitted: "Pending Verification",
+  //   methods: formData.methods.length > 0 ? formData.methods.join(", ") : "bKash, Nagad, Bank, Cash",
+  //   docs: formData.docs.length > 0 ? formData.docs : ["📄 Pending verification"],
+  // };
 
   return (
     <div className="min-h-screen bg-[#FAF9F5] text-slate-800 pb-16 pt-8 font-sans">
@@ -551,9 +552,9 @@ export default function DonationRequestPage() {
                   </div>
 
                   {/* Added Doc tags */}
-                  <div className="flex flex-wrap items-center gap-2 p-3 rounded-2xl border border-slate-200 bg-slate-50">
-                    <span className="text-xs font-bold text-slate-500">Selected Docs:</span>
-                    {formData.docs.map((doc) => (
+                  {/* <div className="flex flex-wrap items-center gap-2 p-3 rounded-2xl border border-slate-200 bg-slate-50"> */}
+                    {/* <span className="text-xs font-bold text-slate-500">Selected Docs:</span> */}
+                    {/* {formData.docs.map((doc) => (
                       <span
                         key={doc}
                         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 bg-white text-xs font-medium text-slate-700 shadow-2xs"
@@ -582,16 +583,16 @@ export default function DonationRequestPage() {
                             addCustomDoc();
                           }
                         }}
-                      />
-                      <button
+                      /> */}
+                      {/* <button
                         type="button"
                         onClick={addCustomDoc}
                         className="p-1 rounded-lg bg-[#3D8D7A] text-white hover:bg-[#2b6658]"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
+                      </button> */}
+                    {/* </div> */}
+                  {/* </div> */}
                 </div>
 
                 {/* Photo selection */}
