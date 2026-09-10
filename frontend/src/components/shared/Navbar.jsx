@@ -1,22 +1,13 @@
 import { useState } from "react";
 import { Bell, ChevronDown, LogOut, User, LayoutDashboard, Menu, X } from "lucide-react";
 
-// ---------------------------------------------------------------------------
-// USAGE
-// <Navbar isLoggedIn={false} />
-// <Navbar isLoggedIn={true} user={{ name: "Azmaeen Rahman", avatarUrl: "/uploads/avatar.jpg" }} />
-//
-// Swap `onLogout` for your real logout call (clear token, hit
-// /api/v1/auth/logout, then redirect). Swap the <a href> tags for your
-// router's <Link>/useNavigate once routing is wired up.
-// ---------------------------------------------------------------------------
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Browse Requests", href: "/requests" },
   { label: "Request Donation", href: "/donation-request" },
   { label: "Zakat Calculator", href: "/zakat-calculator" },
-  { label: "About", href: "/about" },
+  // { label: "About", href: "/about" },
 ];
 
 export default function Navbar({

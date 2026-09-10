@@ -1,6 +1,7 @@
  
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, HandHeart, ArrowRight } from "lucide-react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 // ---------------------------------------------------------------------------
 // BOILERPLATE API CALL — replace the inside of this function with your real
@@ -36,6 +37,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -45,10 +48,10 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      const result = await loginUser(form);
+      // const result = await loginUser(form);
       // TODO: store result.data.accessToken (memory/state) and redirect
       // e.g. navigate("/dashboard")
-      console.log("Login success:", result);
+      console.log("Login success:");
       navigate("/requests");
     } catch (err) {
       setError(err.message);

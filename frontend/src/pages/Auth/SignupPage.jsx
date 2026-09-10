@@ -14,6 +14,7 @@ import {
   Building2,
   Check,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // ---------------------------------------------------------------------------
 // BOILERPLATE API CALL — replace the inside of this function with your real
@@ -63,6 +64,8 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
@@ -92,10 +95,11 @@ export default function Signup() {
         }),
       };
 
-      const result = await registerUser(payload);
+      // const result = await registerUser(payload);
       // TODO: store result.data.accessToken and redirect
       // e.g. navigate("/dashboard")
-      console.log("Signup success:", result);
+      console.log("Signup success:");
+      navigate("/login");
     } catch (err) {
       setError(err.message);
     } finally {
