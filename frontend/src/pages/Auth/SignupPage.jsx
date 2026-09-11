@@ -22,10 +22,11 @@ import { useNavigate } from "react-router-dom";
 // the same so you don't have to touch the component below.
 // ---------------------------------------------------------------------------
 async function registerUser(payload) {
-  const res = await fetch("/api/v1/auth/register", {
+  console.log('payload', payload);
+  const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  const res = await fetch(apiBase + "/api/auth/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    credentials: "include",
     body: JSON.stringify(payload),
   });
 
@@ -35,7 +36,7 @@ async function registerUser(payload) {
     throw new Error(data?.message || "Signup failed. Please try again.");
   }
 
-  return data; // expected: { data: { user, accessToken } }
+  return data;
 }
 
 // Replace with your real Google OAuth flow.
@@ -95,10 +96,8 @@ export default function Signup() {
         }),
       };
 
-      // const result = await registerUser(payload);
-      // TODO: store result.data.accessToken and redirect
-      // e.g. navigate("/dashboard")
-      console.log("Signup success:");
+      const result = await registerUser(payload);
+      console.log("Signup success:", result);
       navigate("/login");
     } catch (err) {
       setError(err.message);

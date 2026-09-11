@@ -10,14 +10,13 @@ const NAV_LINKS = [
   { label: "Zakat Calculator", href: "/zakat-calculator" },
 ];
 
-export default function Navbar({
-  isLoggedIn = false,
-  user = { name: "Guest User", avatarUrl: "" },
-  notificationCount = 0,
-  onLogout = () => console.log("TODO: hook up logout"),
-}) {
+export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  
 
   return (
     <header
