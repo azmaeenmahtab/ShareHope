@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const { connectDB } = require('./db');
 const requestRoute = require('./routes/requestRoute');
+const authRoute = require('./routes/authRoute');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,6 +23,8 @@ app.get('/', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRoute);
+app.use('/api/v1/auth', authRoute);
 app.use('/api/request', requestRoute);
 
 // Start the server
