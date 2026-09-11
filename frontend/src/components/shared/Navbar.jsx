@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Bell, ChevronDown, LogOut, User, LayoutDashboard, Menu, X } from "lucide-react";
-
+import { Link } from "react-router-dom";
+import logoImg from "../../assets/ShareHope.png";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Browse Requests", href: "/requests" },
   { label: "Request Donation", href: "/donation-request" },
   { label: "Zakat Calculator", href: "/zakat-calculator" },
-  // { label: "About", href: "/about" },
 ];
 
 export default function Navbar({
@@ -21,41 +21,34 @@ export default function Navbar({
 
   return (
     <header
-      className="sticky top-0 z-50 w-full border-b"
-      style={{ backgroundColor: "#FBFFE4", borderColor: "#e2e8f0" }}
+      className="sticky top-0 z-50 w-full border-b transition-colors bg-[#FAF8F5]/90 backdrop-blur-md border-[#E5EFEA]"
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-18">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2 shrink-0">
-            <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden"
-              style={{ backgroundColor: "#3D8D7A" }}
-            >
-              <Image
-                src="src/assets/ShareHope.png"
+          <Link to="/" className="flex items-center gap-3 shrink-0 group">
+            <div className="w-11 h-11 rounded-2xl flex items-center justify-center overflow-hidden bg-[#0D5C46] shadow-sm transition-transform group-hover:scale-105">
+              <img
+                src={logoImg}
                 alt="ShareHope logo"
                 className="w-full h-full object-cover"
               />
             </div>
-            <span className="text-lg font-semibold tracking-tight text-slate-800">
+            <span className="text-xl font-bold tracking-tight text-[#0D5C46]">
               ShareHope
             </span>
-          </a>
+          </Link>
 
           {/* Desktop nav links */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1.5">
             {NAV_LINKS.map((link) => (
-              <a
+              <Link
                 key={link.label}
-                href={link.href}
-                className="px-3.5 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 transition"
-                style={{ ["--hover-bg"]: "#B3D8A8" }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#B3D8A8")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                to={link.href}
+                className="px-3.5 py-2 rounded-xl text-sm font-medium text-[#334E44] hover:text-[#0D5C46] hover:bg-[#EAF4F0] transition-all"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -65,15 +58,12 @@ export default function Navbar({
               <>
                 <button
                   type="button"
-                  className="relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-slate-100 transition"
+                  className="relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#EAF4F0] text-[#0D5C46] transition"
                   aria-label="Notifications"
                 >
-                  <Bell className="w-4.5 h-4.5 text-slate-600" />
+                  <Bell className="w-4.5 h-4.5" />
                   {notificationCount > 0 && (
-                    <span
-                      className="absolute top-1 right-1 w-2 h-2 rounded-full"
-                      style={{ backgroundColor: "#3D8D7A" }}
-                    />
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#0D5C46]" />
                   )}
                 </button>
 
@@ -82,29 +72,24 @@ export default function Navbar({
                   <button
                     type="button"
                     onClick={() => setProfileOpen(!profileOpen)}
-                    className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 transition"
+                    className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full border border-[#D4E9E2] bg-white hover:bg-[#F2F8F5] transition shadow-2xs"
                   >
-                    <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 bg-slate-200">
+                    <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 bg-[#0D5C46] text-white flex items-center justify-center text-xs font-bold">
                       {user.avatarUrl ? (
-                        <Image
+                        <img
                           src={user.avatarUrl}
                           alt={user.name}
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div
-                          className="w-full h-full flex items-center justify-center text-xs font-semibold text-white"
-                          style={{ backgroundColor: "#3D8D7A" }}
-                        >
-                          {user.name?.charAt(0)?.toUpperCase() || "U"}
-                        </div>
+                        user.name?.charAt(0)?.toUpperCase() || "U"
                       )}
                     </div>
-                    <span className="text-sm font-medium text-slate-700 max-w-[110px] truncate">
+                    <span className="text-sm font-medium text-[#1A382E] max-w-[110px] truncate">
                       {user.name}
                     </span>
                     <ChevronDown
-                      className={`w-3.5 h-3.5 text-slate-400 transition-transform ${
+                      className={`w-3.5 h-3.5 text-[#5C7E72] transition-transform ${
                         profileOpen ? "rotate-180" : ""
                       }`}
                     />
@@ -116,26 +101,26 @@ export default function Navbar({
                         className="fixed inset-0 z-10"
                         onClick={() => setProfileOpen(false)}
                       />
-                      <div className="absolute right-0 mt-2 w-52 rounded-xl border border-slate-200 bg-white shadow-lg py-1.5 z-20">
-                        <a
-                          href="/profile"
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                      <div className="absolute right-0 mt-2 w-52 rounded-2xl border border-[#D4E9E2] bg-white shadow-xl py-2 z-20">
+                        <Link
+                          to="/profile"
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#1A382E] hover:bg-[#EAF4F0]"
                         >
-                          <User className="w-4 h-4 text-slate-500" />
+                          <User className="w-4 h-4 text-[#0D5C46]" />
                           My Profile
-                        </a>
-                        <a
-                          href="/dashboard"
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                        </Link>
+                        <Link
+                          to="/dashboard"
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#1A382E] hover:bg-[#EAF4F0]"
                         >
-                          <LayoutDashboard className="w-4 h-4 text-slate-500" />
+                          <LayoutDashboard className="w-4 h-4 text-[#0D5C46]" />
                           Dashboard
-                        </a>
-                        <div className="my-1 border-t border-slate-100" />
+                        </Link>
+                        <div className="my-1 border-t border-[#EAF4F0]" />
                         <button
                           type="button"
                           onClick={onLogout}
-                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"
+                          className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-[#0D5C46] hover:bg-[#EAF4F0]"
                         >
                           <LogOut className="w-4 h-4" />
                           Log out
@@ -147,19 +132,18 @@ export default function Navbar({
               </>
             ) : (
               <>
-                <a
-                  href="/login"
-                  className="px-4 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-100 transition"
+                <Link
+                  to="/login"
+                  className="px-4 py-2 rounded-xl text-sm font-semibold text-[#0D5C46] hover:bg-[#EAF4F0] transition"
                 >
                   Log in
-                </a>
-                <a
-                  href="/signup"
-                  className="px-4 py-2 rounded-xl text-sm font-semibold text-white transition"
-                  style={{ backgroundColor: "#3D8D7A" }}
+                </Link>
+                <Link
+                  to="/signup"
+                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-[#FAF8F5] bg-[#0D5C46] hover:bg-[#094433] transition shadow-sm hover:shadow-md"
                 >
                   Sign up
-                </a>
+                </Link>
               </>
             )}
           </div>
@@ -168,7 +152,7 @@ export default function Navbar({
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-slate-700"
+            className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl text-[#0D5C46] hover:bg-[#EAF4F0]"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -177,58 +161,55 @@ export default function Navbar({
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-slate-200 px-5 py-4 space-y-1 bg-white">
+        <div className="md:hidden border-t border-[#E5EFEA] px-5 py-4 space-y-1 bg-[#FAF8F5]">
           {NAV_LINKS.map((link) => (
-            <a
+            <Link
               key={link.label}
-              href={link.href}
-              className="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+              to={link.href}
+              onClick={() => setMobileOpen(false)}
+              className="block px-3 py-2.5 rounded-xl text-sm font-medium text-[#2D473E] hover:bg-[#EAF4F0] hover:text-[#0D5C46]"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
 
-          <div className="pt-3 mt-2 border-t border-slate-100">
+          <div className="pt-3 mt-2 border-t border-[#E5EFEA]">
             {isLoggedIn ? (
               <div className="flex items-center gap-3 px-3 py-2">
-                <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 bg-slate-200">
+                <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 bg-[#0D5C46] text-white flex items-center justify-center font-bold text-xs">
                   {user.avatarUrl ? (
-                    <Image src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                    <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
                   ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center text-xs font-semibold text-white"
-                      style={{ backgroundColor: "#3D8D7A" }}
-                    >
-                      {user.name?.charAt(0)?.toUpperCase() || "U"}
-                    </div>
+                    user.name?.charAt(0)?.toUpperCase() || "U"
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-800 truncate">{user.name}</p>
+                  <p className="text-sm font-medium text-[#1A382E] truncate">{user.name}</p>
                   <button
                     type="button"
                     onClick={onLogout}
-                    className="text-xs font-medium text-red-600"
+                    className="text-xs font-medium text-[#0D5C46]"
                   >
                     Log out
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="flex gap-2 px-3">
-                <a
-                  href="/login"
-                  className="flex-1 text-center py-2.5 rounded-xl text-sm font-medium text-slate-700 border border-slate-200"
+              <div className="flex gap-2 px-1">
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex-1 text-center py-2.5 rounded-xl text-sm font-medium text-[#0D5C46] border border-[#D4E9E2] bg-white"
                 >
                   Log in
-                </a>
-                <a
-                  href="/signup"
-                  className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold text-white"
-                  style={{ backgroundColor: "#3D8D7A" }}
+                </Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0D5C46]"
                 >
                   Sign up
-                </a>
+                </Link>
               </div>
             )}
           </div>
@@ -236,10 +217,4 @@ export default function Navbar({
       )}
     </header>
   );
-}
-
-// Simple <img> wrapper kept as its own component so it's a single obvious
-// place to swap in next/image or another image component later if needed.
-function Image({ src, alt, className }) {
-  return <img src={src} alt={alt} className={className} />;
 }
