@@ -1,14 +1,16 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./db');
+const { connectDB } = require('./db');
 const requestRoute = require('./routes/requestRoute');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Connect to Database
-connectDB();
+connectDB().catch((error) => {
+  console.error('Database startup error:', error.message);
+});
 
 // Middleware
 app.use(cors());
@@ -20,7 +22,7 @@ app.get('/', (req, res) => {
 });
 
 // API Routes
-app.use('/api', requestRoute);
+app.use('/api/request', requestRoute);
 
 // Start the server
 app.listen(PORT, () => {
