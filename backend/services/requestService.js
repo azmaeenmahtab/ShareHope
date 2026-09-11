@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-const DonationRequest = require('../models/DonationRequest');
+const { getDonationRequestsCollection } = require('../db');
 
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=700&auto=format&fit=crop';
 
@@ -90,19 +89,21 @@ function normalizeRequestPayload(payload = {}) {
 async function createRequestService(payload = {}) {
   const normalizedRequest = normalizeRequestPayload(payload);
 
-  if (mongoose.connection.readyState === 1) {
-    try {
-      const savedRequest = await DonationRequest.create(normalizedRequest);
-      return savedRequest.toObject ? savedRequest.toObject() : savedRequest;
-    } catch (error) {
-      if (error.name === 'ValidationError') {
-        throw new Error(error.message);
-      }
-      throw error;
-    }
+  const collection = getDonationRequestsCollection();
+
+  if (!collection) {
+    return normalizedRequest;
   }
 
-  return normalizedRequest;
+  try {
+    const result = await collection.insertOne(normalizedRequest);
+    return {
+      ...normalizedRequest,
+      _id: result.insertedId,
+    };
+  } catch (error) {
+    throw new Error(error.message || 'Unable to save donation request');
+  }
 }
 
 module.exports = {
