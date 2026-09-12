@@ -10,6 +10,7 @@ import DonationRequestPage from './pages/DonationRequestPage'
 import TransactionPage from './pages/profile/transaction'
 import MyProfile from './pages/profile/myProfile'
 import MyRequests from './pages/profile/myRequests'
+import ZakatCalculator from './pages/ZakatCalculator'
 
 
 export const router = createBrowserRouter([
@@ -56,6 +57,10 @@ export const router = createBrowserRouter([
       {
         path: '/my-requests',
         element: <MyRequests />,
+      },
+      {
+        path: '/zakat-calculator',
+        element: <ZakatCalculator />,
       },
      
     ],
