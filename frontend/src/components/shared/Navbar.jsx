@@ -18,31 +18,29 @@ export default function Navbar() {
   const [notificationCount, setNotificationCount] = useState(0);
  
  
-  const { user, isLoggedIn, setIsLoggedIn, loading } = useContext(AuthContext);
+  const { user, isLoggedIn, setIsLoggedIn, setUser, loading } = useContext(AuthContext);
 
-  if(loading){
-    return <h1 >Loading...</h1>
-  }
+const apiBase = import.meta.env.VITE_API_BASE_URL;
 
-  if(user == null){
-    setIsLoggedIn(false);
-    return <Navigate to="/login" />
-  }
+  
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("/api/auth/logout", {
+      const response = await fetch(apiBase+"/api/auth/logout", {
         method: "POST",
+        body: JSON.stringify({
+          email: user.email
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
       });
 
-      if (response.ok) {
-        setIsLoggedIn(false);
-        setUser({ name: "", avatarUrl: "" });
-        // Optionally, you can redirect the user to the login page or home page
-      } else {
-        console.error("Logout failed");
-      }
+      setUser(null);
+      setIsLoggedIn(false);
+      document.cookie = null
+      return <Navigate to="/login" />;
     } catch (error) {
       console.error("Error during logout:", error);
     }
@@ -85,7 +83,11 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="hidden md:flex items-center gap-3">
-            {isLoggedIn ? (
+            {loading ? (
+              <div className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#EAF4F0] text-[#0D5C46] transition">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#0D5C46]" />
+              </div>
+            ):isLoggedIn ? (
               <>
                 <button
                   type="button"
@@ -161,7 +163,7 @@ export default function Navbar() {
                   )}
                 </div>
               </>
-            ) : (
+              ):(
               <>
                 <Link
                   to="/login"

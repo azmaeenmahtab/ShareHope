@@ -16,6 +16,8 @@ const verifyTokenMiddleware = (req, res, next) => {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decodedToken;
 
+        
+
         console.log('middleware passed successfully. user data is in req.user : ', req.user);
         next();
     } catch (err) {

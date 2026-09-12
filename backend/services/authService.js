@@ -1,7 +1,9 @@
 const db = require('../db');
 const { assignNewTokenService } = require('../utils/token');
+const { ObjectId } = require('mongodb');
 
 const usercollection = 'user';
+const tokenCollection = 'authorizedToken'
 
 const signupService = async (userData) => {
   const database = db.getDb();
@@ -79,13 +81,46 @@ const authMeService = async (email) => {
     throw new Error('User not found');
   }
 
+  const tokenRecord = await database.collection(tokenCollection).findOne({ userId: user._id });
+
+  if(!tokenRecord){
+    throw new Error('Token not found');
+  }
+
   // Return user details without password
   const {_id, password:_, ...userWithoutPassword} = user;
   return userWithoutPassword;
 };
 
+
+const logoutService = async (email) => {
+  try {
+    const database = db.getDb();
+    if (!database) {
+      throw new Error('Database is not connected');
+    }
+    const normalizedEmail = String(email).toLowerCase().trim();
+    const user = await database.collection(usercollection).findOne({ email: normalizedEmail });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const objectId = new ObjectId(user._id);
+
+    const result = await database.collection("authorizedToken").deleteMany(
+      { userId: objectId }
+    );
+
+    console.log("result from logout service : ", result);
+    return result.deletedCount > 0;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   signupService,
   loginService,
   authMeService,
+  logoutService
 };

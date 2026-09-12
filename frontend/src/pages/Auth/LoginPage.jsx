@@ -1,10 +1,13 @@
  
-import { useState } from "react";
+import { useState, useContext  } from "react";
 import { Mail, Lock, Eye, EyeOff, HandHeart, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
+import { AuthContext } from "../../context/authContext";
+
 
 
 async function loginUser({ email, password }) {
+
   const apiBase = import.meta.env.VITE_API_BASE_URL;
   const res = await fetch(apiBase + "/api/auth/login", {
     method: "POST",
@@ -14,11 +17,13 @@ async function loginUser({ email, password }) {
   });
 
   const data = await res.json();
+  
 
   if (!res.ok) {
     throw new Error(data?.message || "Login failed. Please try again.");
   }
 
+ 
   return data; 
 }
 
@@ -32,7 +37,10 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+
   const navigate = useNavigate();
+  const {setUser, setIsLoggedIn} = useContext(AuthContext)
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -45,7 +53,8 @@ export default function Login() {
     try {
       const result = await loginUser(form);
       console.log("Login success:", result);
-      
+      setUser(result.user);
+      setIsLoggedIn(true);
       navigate("/requests");
     } catch (err) {
       setError(err.message);

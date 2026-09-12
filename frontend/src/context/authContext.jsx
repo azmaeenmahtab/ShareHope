@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
         const data = await res.json();
         setUser(data.user);
         setIsLoggedIn(true);
-        console.log("user data from context : ", data)
+        console.log("user data from context : ", data.user)
       } catch (error) {
         console.error("Error fetching user data:", error);
         setUser(null);
