@@ -28,7 +28,7 @@ export default function CategorySection({ section, cases, visible, page, onPageC
             type="button"
             aria-current={page === pageNumber ? "page" : undefined}
             onClick={() => onPageChange(pageNumber)}
-            className={`h-5 min-w-5 rounded-lg border px-2.5 text-sm font-semibold transition-colors ${
+            className={`h-6 min-w-5 rounded-lg border px-2.5 text-sm font-semibold transition-colors ${
               page === pageNumber
                 ? "border-[#3D8D7A] bg-[#3D8D7A] text-white"
                 : "border-slate-200 bg-white text-slate-600 hover:border-[#3D8D7A] hover:text-[#3D8D7A]"
