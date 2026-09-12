@@ -93,9 +93,8 @@ function normalizeRequestPayload(payload = {}) {
     relationship,
     submitterEmail: submitterEmail || undefined,
     verified: false,
-    raised: '৳ 0 raised',
-    percent: 0,
-    submitted: 'Just now',
+    raised: Number.isFinite(Number(payload.raised)) ? Number(payload.raised) : 0,
+    percent: Number(goalRaw) > 0 ? Math.min(100, Math.round(((Number.isFinite(Number(payload.raised)) ? Number(payload.raised) : 0) / Number(goalRaw)) * 100)) : 0,
     createdAt: new Date(),
   };
 }
