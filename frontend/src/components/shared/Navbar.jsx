@@ -137,17 +137,19 @@ const apiBase = import.meta.env.VITE_API_BASE_URL;
                       <div className="absolute right-0 mt-2 w-52 rounded-2xl border border-[#D4E9E2] bg-white shadow-xl py-2 z-20">
                         <Link
                           to="/profile"
+                          onClick={() => setProfileOpen(false)}
                           className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#1A382E] hover:bg-[#EAF4F0]"
                         >
                           <User className="w-4 h-4 text-[#0D5C46]" />
                           My Profile
                         </Link>
                         <Link
-                          to="/dashboard"
+                          to="/transaction"
+                          onClick={() => setProfileOpen(false)}
                           className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#1A382E] hover:bg-[#EAF4F0]"
                         >
                           <LayoutDashboard className="w-4 h-4 text-[#0D5C46]" />
-                          Dashboard
+                          Transactions
                         </Link>
                         <div className="my-1 border-t border-[#EAF4F0]" />
                         <button

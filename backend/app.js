@@ -4,6 +4,7 @@ const cors = require('cors');
 const { connectDB } = require('./db');
 const requestRoute = require('./routes/requestRoute');
 const authRoute = require('./routes/authRoute');
+const transactionRoute = require('./routes/transactionRoute');
 const cookieParser = require('cookie-parser');
 
 const app = express();
@@ -41,6 +42,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoute);
 app.use('/api/v1/auth', authRoute);
 app.use('/api/request', requestRoute);
+app.use('/api/transactions', transactionRoute);
 
 // Start the server
 app.listen(PORT, () => {

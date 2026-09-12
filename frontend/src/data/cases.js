@@ -44,7 +44,7 @@ export const CASES = {
       image: "https://www.anera.org/wp-content/uploads/2018/10/dsc_9733_44882985711_o-edit.jpg",
       desc: "22-year-old needs immediate dialysis sessions this week; hospital has confirmed the treatment plan and provided a signed cost estimate.",
       raised: "৳ 9,000 raised", goal: "৳ 50,000", percent: 18,
-      area: "Mirpur-11, Dhaka", category:"Medical support",
+      area: "Mirpur-11, Dhaka", category:"Medical & Health",
       submitted: "10 Aug 2026", 
       methods: "bKash, Nagad, Bank, Cash",
       docs:["📄 NID copy", "📄 Medical report", "📄 Hospital note"]
@@ -54,7 +54,7 @@ export const CASES = {
       image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBCJpgdGo3fUVCPH-D2U0RMHe14oFSlZyFzP92OvaxxtIZ_WjnZ5L1Nao&s=10",
       desc: "40 families displaced by flash flooding need clean water, tarpaulin and dry food within 72 hours. Coordinated with local union council.",
       raised: "৳ 87,000 raised", goal: "৳ 300,000", percent: 29,
-      area: "Moheshkhali, Chittagong", category:"Disaster support",
+      area: "Moheshkhali, Chittagong", category:"Disaster & Flood Relief",
       submitted: "11 Aug 2026", 
       methods: "bKash, Nagad, Bank, Cash",
       docs:["📄 Verification Photos", "📄 Council Approval", "📄 Distribution details"]
@@ -64,22 +64,34 @@ export const CASES = {
       image: "https://images.seeklogo.com/logo-png/54/2/as-sunnah-foundation-logo-png_seeklogo-549763.png",
       desc: "Supporting underprivileged people with essential supplies and resources.",
       raised: "৳ 219,000 raised", goal: "৳ 300,000", percent: 73,
-      area: "Badda, Dhaka", category:"Humanitarian support",
+      area: "Badda, Dhaka", category:"Food & Monthly Ration",
       submitted: "25 Jul 2026", 
       methods: "bKash, Nagad, Bank, Cash",
       docs:["📄 Project plans", "📄 Organization Certificate", "📄 NGO License"]
     }
 };
 
+export const CATEGORIES = [
+  "Family support",
+  "Financial support",
+  "Medical & Health",
+  "Education & Tuition",
+  "Food & Monthly Ration",
+  "Disaster & Flood Relief",
+  "Emergency Dialysis",
+  "Orphan Care",
+  "Shelter & Housing",
+];
+
 // Which cases render under each filterable category section, in order.
 export const SECTIONS = [
   {
-    key: "nearby",
-    title: "Nearby your area",
-    hint: "Bashundhara, Dhaka · within 5 km",
-    moreLabel: "View more nearby requests",
-    moreHref: "/category?category=nearby",
-    caseIds: [1, 2],
+    key: "all",
+    title: "All requests",
+    hint: "Every active request on ShareHope",
+    moreLabel: "View more requests",
+    moreHref: "/category?category=all",
+    caseIds: Object.keys(CASES),
   },
   {
     key: "urgent",
@@ -89,22 +101,12 @@ export const SECTIONS = [
     moreHref: "/category?category=urgent",
     caseIds: [3, 4],
   },
-  {
-    key: "verified",
-    title: "Verified Requests",
-    hint: "Documents verified by ShareHope authority",
-    moreLabel: "View more verified organizations",
-    moreHref: "/category?category=verified",
-    caseIds: [5],
-  },
 ];
 
 export const CHIPS = [
   { key: "all", label: "All requests" },
-  { key: "nearby", label: "Nearby your area" },
   { key: "urgent", label: "Urgent needs" },
-  { key: "verified", label: "Verified only" },
-  { key: "family", label: "Select Category" },
+  { key: "categories", label: "Select category" },
 ];
 
 // Payment method tiles shown in the "choose payment method" modal.

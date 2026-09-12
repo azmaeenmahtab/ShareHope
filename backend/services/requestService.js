@@ -113,7 +113,6 @@ async function createRequestService(payload = {}) {
 
   const collection = database.collection(REQUESTS_COLLECTION);
 
-
   try {
     const result = await collection.insertOne(normalizedRequest);
     return {
@@ -125,7 +124,24 @@ async function createRequestService(payload = {}) {
   }
 }
 
+async function getAllRequestsService(filter = {}) {
+  let database = db.getDb();
+  if (!database) {
+    console.log('[requestService] Database not yet initialized, attempting to connect...');
+    database = await db.connectDB();
+  }
+  if (!database) {
+    throw new Error('Database is not connected. Please try again in a moment.');
+  }
+
+  const collection = database.collection(REQUESTS_COLLECTION);
+  const requests = await collection.find(filter).sort({ createdAt: -1 }).toArray();
+  return requests;
+}
+
 module.exports = {
   createRequestService,
+  getAllRequestsService,
   normalizeRequestPayload,
 };
+
