@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState, useContext } from "react";
-import { Bell, ChevronDown, LogOut, User, LayoutDashboard, Menu, X } from "lucide-react";
+import { Bell, ChevronDown, LogOut, User, LayoutDashboard, ClipboardList, Menu, X } from "lucide-react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import logoImg from "../../assets/ShareHope.png";
 import { AuthContext } from "../../context/authContext";
@@ -156,6 +156,14 @@ const apiBase = import.meta.env.VITE_API_BASE_URL;
                         >
                           <LayoutDashboard className="w-4 h-4 text-[#0D5C46]" />
                           Transactions
+                        </Link>
+                        <Link
+                          to="/my-requests"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-[#1A382E] hover:bg-[#EAF4F0]"
+                        >
+                          <ClipboardList className="w-4 h-4 text-[#0D5C46]" />
+                          My requests
                         </Link>
                         <div className="my-1 border-t border-[#EAF4F0]" />
                         <button
