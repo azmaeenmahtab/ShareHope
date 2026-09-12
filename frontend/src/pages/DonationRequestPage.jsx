@@ -70,17 +70,7 @@ const PAYMENT_OPTIONS = [
   { id: "Cash", label: "Cash Collection", color: "border-emerald-200 bg-emerald-50/60 text-emerald-700" },
 ];
 
-const CATEGORIES = [
-  "Family support",
-  "Financial support",
-  "Medical & Health",
-  "Education & Tuition",
-  "Food & Monthly Ration",
-  "Disaster & Flood Relief",
-  "Emergency Dialysis",
-  "Orphan Care",
-  "Shelter & Housing",
-];
+import { CATEGORIES } from "../data/cases";
 
 export default function DonationRequestPage() {
   const [formData, setFormData] = useState({

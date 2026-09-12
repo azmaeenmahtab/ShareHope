@@ -1,8 +1,12 @@
 import DonationCard from "./DonationCard";
-import { ArrowRightIcon } from "./Icons";
 
-export default function CategorySection({ section, cases, visible, onOpenDetails }) {
+const PAGE_SIZE = 5;
+
+export default function CategorySection({ section, cases, visible, page, onPageChange, onOpenDetails }) {
   if (!visible) return null;
+
+  const totalPages = Math.ceil(cases.length / PAGE_SIZE);
+  const pageCases = cases.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <section className="mt-8">
@@ -12,20 +16,29 @@ export default function CategorySection({ section, cases, visible, onOpenDetails
       </div>
 
       <div className="flex flex-col gap-4">
-        {cases.map((data) => (
+        {pageCases.map((data) => (
           <DonationCard key={data.id} data={data} onOpenDetails={onOpenDetails} />
         ))}
       </div>
 
-      <div className="mt-5 flex justify-start">
-        <a
-          href={section.moreHref}
-          className="group inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-slate-200 bg-white px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#3D8D7A] shadow-sm transition-all hover:border-[#3D8D7A] hover:bg-emerald-50/50"
-        >
-          {section.moreLabel}
-          <ArrowRightIcon className="transition-transform group-hover:translate-x-1" />
-        </a>
-      </div>
+      <nav className="mt-5 flex items-center justify-center gap-1.5" aria-label={`${section.title} pages`}>
+        {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+          <button
+            key={pageNumber}
+            type="button"
+            aria-current={page === pageNumber ? "page" : undefined}
+            onClick={() => onPageChange(pageNumber)}
+            className={`h-5 min-w-5 rounded-lg border px-2.5 text-sm font-semibold transition-colors ${
+              page === pageNumber
+                ? "border-[#3D8D7A] bg-[#3D8D7A] text-white"
+                : "border-slate-200 bg-white text-slate-600 hover:border-[#3D8D7A] hover:text-[#3D8D7A]"
+            }`}
+          >
+            {pageNumber}
+          </button>
+        ))}
+      </nav>
     </section>
   );
 }
+

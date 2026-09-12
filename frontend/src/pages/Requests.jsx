@@ -9,19 +9,22 @@ import MethodModal from "../components/modals/MethodModal";
 import MobileWalletModal from "../components/modals/MobileWalletModal";
 import SimpleModal from "../components/modals/SimpleModal";
 import SuccessModal from "../components/modals/SuccessModal";
-import { CASES, SECTIONS, WALLET_METHODS } from "../data/cases";
+import { CASES, OFFLINE_METHODS, SECTIONS, WALLET_METHODS } from "../data/cases";
 
 export default function Requests() {
  
   // Search + category filter
   const [query, setQuery] = useState("");
   const [activeChip, setActiveChip] = useState("all");
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [currentPages, setCurrentPages] = useState({});
 
   // Details / report / payment flow — mirrors the original chained-overlay behavior
   const [detailsCase, setDetailsCase] = useState(null);
   const [reportOpen, setReportOpen] = useState(false);
   const [methodOpen, setMethodOpen] = useState(false);
   const [purpose, setPurpose] = useState("donation");
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const [walletMethod, setWalletMethod] = useState(null); // 'bkash' | 'nagad' | 'rocket'
   const [simpleMethod, setSimpleMethod] = useState(null); // 'bank' | 'cash'
   const [successOpen, setSuccessOpen] = useState(false);
@@ -37,19 +40,52 @@ export default function Requests() {
   };
 
   const filteredQuery = query.trim().toLowerCase();
-  const matchesSearch = (data) =>
-    !filteredQuery ||
-    data.name.toLowerCase().includes(filteredQuery) ||
-    data.id.toLowerCase().includes(filteredQuery);
+
+  const resetPages = () => setCurrentPages({});
+
+  const handleQueryChange = (value) => {
+    setQuery(value);
+    resetPages();
+  };
 
   const sectionsWithCases = useMemo(
-    () =>
-      SECTIONS.map((section) => ({
-        section,
-        cases: section.caseIds.map((id) => CASES[id]).filter(matchesSearch),
-      })),
-    [filteredQuery]
+    () => SECTIONS.map((section) => ({
+      section,
+      cases: section.caseIds
+        .map((id) => CASES[id])
+        .filter(
+          (data) =>
+            (!filteredQuery ||
+              data.name.toLowerCase().includes(filteredQuery) ||
+              data.id.toLowerCase().includes(filteredQuery)) &&
+            (selectedCategories.length === 0 || selectedCategories.includes(data.category))
+        ),
+    })),
+    [filteredQuery, selectedCategories]
   );
+
+  const handleChipChange = (chip) => {
+    if (chip === "categories") {
+      setActiveChip("categories");
+      resetPages();
+      return;
+    }
+    setSelectedCategories([]);
+    setActiveChip(chip);
+    resetPages();
+  };
+
+  const toggleCategory = (category) => {
+    setActiveChip("categories");
+    resetPages();
+    setSelectedCategories((current) =>
+      current.includes(category) ? current.filter((item) => item !== category) : [...current, category]
+    );
+  };
+
+  const handlePageChange = (sectionKey, page) => {
+    setCurrentPages((current) => ({ ...current, [sectionKey]: page }));
+  };
 
   const openDetails = (data) => setDetailsCase(data);
   const closeDetails = () => setDetailsCase(null);
@@ -65,6 +101,7 @@ export default function Requests() {
   };
 
   const proceedToMethod = (chosenPurpose) => {
+    setSelectedRequest(detailsCase);
     setDetailsCase(null);
     setPurpose(chosenPurpose);
     setMethodOpen(true);
@@ -79,14 +116,49 @@ export default function Requests() {
     }
   };
 
-  const confirmWalletPayment = () => {
-    setWalletMethod(null);
-    setSuccessOpen(true);
+  const saveTransaction = async ({ amount, transactionId = "" }, paymentMethod) => {
+    const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+    const response = await fetch(`${apiBase}/api/transactions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        amount,
+        transactionId,
+        paymentMethod,
+        purpose,
+        requestId: selectedRequest?.id,
+        counterpartyId: selectedRequest?.id,
+        counterpartyName: selectedRequest?.name,
+        direction: "given",
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Unable to save transaction");
+    return data.transaction;
   };
 
-  const confirmSimplePayment = () => {
-    setSimpleMethod(null);
-    setSuccessOpen(true);
+  const confirmWalletPayment = async (details) => {
+    try {
+      await saveTransaction(details, WALLET_METHODS[walletMethod]?.label || walletMethod);
+      setWalletMethod(null);
+      setSelectedRequest(null);
+      setSuccessOpen(true);
+    } catch (error) {
+      showToast(error.message);
+    }
+  };
+
+  const confirmSimplePayment = async (details) => {
+    try {
+      await saveTransaction(details, OFFLINE_METHODS[simpleMethod]?.label || simpleMethod);
+      setSimpleMethod(null);
+      setSelectedRequest(null);
+      setSuccessOpen(true);
+    } catch (error) {
+      showToast(error.message);
+    }
   };
 
   return (
@@ -96,9 +168,11 @@ export default function Requests() {
         <SearchHero
           userName="Raiyan"
           query={query}
-          onQueryChange={setQuery}
+          onQueryChange={handleQueryChange}
           activeChip={activeChip}
-          onChipChange={setActiveChip}
+          onChipChange={handleChipChange}
+          selectedCategories={selectedCategories}
+          onCategoryToggle={toggleCategory}
         />
 
         {sectionsWithCases.map(({ section, cases }) => (
@@ -106,7 +180,13 @@ export default function Requests() {
             key={section.key}
             section={section}
             cases={cases}
-            visible={(activeChip === "all" || activeChip === section.key) && cases.length > 0}
+            page={currentPages[section.key] || 1}
+            onPageChange={(page) => handlePageChange(section.key, page)}
+            visible={
+              cases.length > 0 &&
+              ((activeChip === "all" || activeChip === "categories") && section.key === "all") ||
+              (activeChip === "urgent" && section.key === "urgent")
+            }
             onOpenDetails={openDetails}
           />
         ))}

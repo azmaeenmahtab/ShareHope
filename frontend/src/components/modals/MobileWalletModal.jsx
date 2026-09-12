@@ -113,7 +113,7 @@ export default function MobileWalletModal({ open, methodKey, onClose, onConfirm 
       <div className="border-t border-slate-100 px-6 py-4 bg-slate-50/50">
         <button
           type="button"
-          onClick={onConfirm}
+          onClick={() => onConfirm({ amount, transactionId: txnId })}
           className="w-full rounded-full bg-[#3D8D7A] hover:bg-[#2b6658] px-5 py-3 text-sm font-semibold text-white shadow-md active:scale-95 transition-all"
         >
           Confirm payment

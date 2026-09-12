@@ -1,7 +1,15 @@
 import { SearchIcon } from "./Icons";
-import { CHIPS } from "../data/cases";
+import { CATEGORIES, CHIPS } from "../data/cases";
 
-export default function SearchHero({ userName, query, onQueryChange, activeChip, onChipChange }) {
+export default function SearchHero({
+  userName,
+  query,
+  onQueryChange,
+  activeChip,
+  onChipChange,
+  selectedCategories,
+  onCategoryToggle,
+}) {
   return (
     <section>
       <h2 className="mb-1 text-xs font-bold uppercase tracking-wider text-[#3D8D7A]">
@@ -50,6 +58,29 @@ export default function SearchHero({ userName, query, onQueryChange, activeChip,
           </button>
         ))}
       </div>
+
+      {activeChip === "categories" && (
+        <div className="mb-2 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          {CATEGORIES.map((category) => {
+            const selected = selectedCategories.includes(category);
+            return (
+              <button
+                key={category}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => onCategoryToggle(category)}
+                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-all ${
+                  selected
+                    ? "border-[#3D8D7A] bg-emerald-50 text-[#2b6658]"
+                    : "border-slate-200 bg-slate-50 text-slate-600 hover:border-[#3D8D7A] hover:text-[#3D8D7A]"
+                }`}
+              >
+                {category}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }
