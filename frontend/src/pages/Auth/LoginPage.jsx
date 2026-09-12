@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 
 async function loginUser({ email, password }) {
-  const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  const apiBase = import.meta.env.VITE_API_BASE_URL;
   const res = await fetch(apiBase + "/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -45,10 +45,7 @@ export default function Login() {
     try {
       const result = await loginUser(form);
       console.log("Login success:", result);
-      // Store token so other pages can attach it to API requests
-      if (result.token) {
-        localStorage.setItem("token", result.token);
-      }
+      
       navigate("/requests");
     } catch (err) {
       setError(err.message);

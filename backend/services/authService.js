@@ -66,7 +66,26 @@ const loginService = async ({ email, password }) => {
   };
 };
 
+const authMeService = async (email) => {
+  const database = db.getDb();
+  if (!database) {
+    throw new Error('Database is not connected');
+  }
+
+  const normalizedEmail = String(email).toLowerCase().trim();
+
+  const user = await database.collection(usercollection).findOne({ email: normalizedEmail });
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // Return user details without password
+  const {_id, password:_, ...userWithoutPassword} = user;
+  return userWithoutPassword;
+};
+
 module.exports = {
   signupService,
   loginService,
+  authMeService,
 };

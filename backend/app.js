@@ -4,8 +4,10 @@ const cors = require('cors');
 const { connectDB } = require('./db');
 const requestRoute = require('./routes/requestRoute');
 const authRoute = require('./routes/authRoute');
+const cookieParser = require('cookie-parser');
 
 const app = express();
+app.use(cookieParser());
 const PORT = process.env.PORT || 5000;
 
 // Connect to Database

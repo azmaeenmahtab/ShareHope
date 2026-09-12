@@ -1,4 +1,4 @@
-const { signupService, loginService } = require('../services/authService');
+const { signupService, loginService, authMeService } = require('../services/authService');
 
 const loginController = async (req, res) => {
   try {
@@ -60,9 +60,29 @@ const signupController = async (req, res) => {
   }
 };
 
+const authMeController = async (req, res) => {
+  const user = req.user;
+  try {
+
+    const userData = await authMeService(user.email);
+
+    return res.status(200).json({
+      success: true,
+      message: "User found",
+      user: userData,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Something went wrong",
+    });
+  }
+}
+
 module.exports = {
   loginController,
   signupController,
+  authMeController,
   LoginController: loginController,
   SignupController: signupController,
 };
