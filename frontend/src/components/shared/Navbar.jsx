@@ -1,7 +1,9 @@
-import { useState } from "react";
+/* eslint-disable no-unused-vars */
+import { useEffect, useState, useContext } from "react";
 import { Bell, ChevronDown, LogOut, User, LayoutDashboard, Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import logoImg from "../../assets/ShareHope.png";
+import { AuthContext } from "../../context/authContext";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -13,8 +15,38 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
+ 
+ 
+  const { user, isLoggedIn, setIsLoggedIn, loading } = useContext(AuthContext);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  if(loading){
+    return <h1 >Loading...</h1>
+  }
+
+  if(user == null){
+    setIsLoggedIn(false);
+    return <Navigate to="/login" />
+  }
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setIsLoggedIn(false);
+        setUser({ name: "", avatarUrl: "" });
+        // Optionally, you can redirect the user to the login page or home page
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  }
 
   
 
@@ -118,7 +150,7 @@ export default function Navbar() {
                         <div className="my-1 border-t border-[#EAF4F0]" />
                         <button
                           type="button"
-                          onClick={onLogout}
+                          onClick={handleLogout}
                           className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-[#0D5C46] hover:bg-[#EAF4F0]"
                         >
                           <LogOut className="w-4 h-4" />
@@ -186,7 +218,7 @@ export default function Navbar() {
                   <p className="text-sm font-medium text-[#1A382E] truncate">{user.name}</p>
                   <button
                     type="button"
-                    onClick={onLogout}
+                    onClick={handleLogout}
                     className="text-xs font-medium text-[#0D5C46]"
                   >
                     Log out

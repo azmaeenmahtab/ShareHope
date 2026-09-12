@@ -4,13 +4,6 @@ const db = require('../db');
 const JWT_SECRET = process.env.JWT_SECRET || 'sharehope_jwt_secret_key_2026_secure';
 const TOKEN_COLLECTION = 'authorizedToken';
 
-/**
- * Checks if user has a valid token in authorizedToken collection.
- * If valid till now, returns it; otherwise generates, saves, and returns a new token.
- *
- * @param {Object} user User document containing _id, email, role, etc.
- * @returns {Promise<string>} Valid JWT token
- */
 const assignNewTokenService = async (user) => {
   if (!user || !user._id) {
     throw new Error('User information with _id is required to assign token');
