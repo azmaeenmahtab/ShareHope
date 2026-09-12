@@ -1,4 +1,4 @@
-import { Check, AlertTriangle, MapPin, Heart, ArrowRight } from "lucide-react";
+import { Check, AlertTriangle, MapPin, ArrowRight } from "lucide-react";
 
 export default function DonationCard({ data, layout = "grid", onOpenDetails, onProceed }) {
   const percent = Math.min(100, Math.max(0, Number(data.percent || 0)));
@@ -119,7 +119,7 @@ export default function DonationCard({ data, layout = "grid", onOpenDetails, onP
                     }}
                     className="inline-flex items-center gap-1 px-4 py-1.5 text-xs font-bold rounded-full bg-[#3D8D7A] hover:bg-[#2b6658] text-white shadow-sm transition active:scale-95"
                   >
-                    <Heart className="w-3 h-3 fill-white" /> Donate
+                     Donate
                   </button>
                 )}
               </div>
@@ -247,7 +247,6 @@ export default function DonationCard({ data, layout = "grid", onOpenDetails, onP
                 }}
                 className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs sm:text-sm font-bold rounded-xl bg-[#3D8D7A] hover:bg-[#2b6658] text-white shadow-md shadow-[#3D8D7A]/20 active:scale-95 transition"
               >
-                <Heart className="w-3.5 h-3.5 fill-white" />
                 <span>Donate</span>
                 <ArrowRight className="w-3 h-3" />
               </button>
