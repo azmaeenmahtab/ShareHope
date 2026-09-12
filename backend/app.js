@@ -5,6 +5,7 @@ const { connectDB } = require('./db');
 const requestRoute = require('./routes/requestRoute');
 const authRoute = require('./routes/authRoute');
 const transactionRoute = require('./routes/transactionRoute');
+const userRoute = require('./routes/userRoute');
 const cookieParser = require('cookie-parser');
 
 const app = express();
@@ -43,6 +44,7 @@ app.use('/api/auth', authRoute);
 app.use('/api/v1/auth', authRoute);
 app.use('/api/request', requestRoute);
 app.use('/api/transactions', transactionRoute);
+app.use('/api/user', userRoute);
 
 // Start the server
 app.listen(PORT, () => {

@@ -165,8 +165,16 @@ export default function Requests() {
   // Filter requests based on query, active chip, and selected categories
   const filteredCases = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const currentUserEmail = user?.email?.trim().toLowerCase();
 
     return dbRequests.filter((item) => {
+      const submitterEmail = item.submitterEmail?.trim().toLowerCase();
+
+      // A user's own requests belong in their profile, not the public browse feed.
+      if (currentUserEmail && submitterEmail === currentUserEmail) {
+        return false;
+      }
+
       // 1. Search Query
       const matchesSearch =
         !q ||
@@ -190,7 +198,7 @@ export default function Requests() {
 
       return true;
     });
-  }, [dbRequests, query, activeChip, selectedCategories]);
+  }, [dbRequests, query, activeChip, selectedCategories, user?.email]);
 
   const openDetails = (data) => setDetailsCase(data);
   const closeDetails = () => setDetailsCase(null);

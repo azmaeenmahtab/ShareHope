@@ -11,7 +11,7 @@ const signupService = async (userData) => {
     throw new Error('Database is not connected');
   }
 
-  const { name, email, password, role } = userData;
+  const { name, email, password, role, phone, isMuslim, organizationName, accountType } = userData;
   const normalizedEmail = String(email).toLowerCase().trim();
 
   // Check if user already exists
@@ -25,6 +25,15 @@ const signupService = async (userData) => {
     email: normalizedEmail,
     password,
     role,
+    phone: String(phone || '').trim(),
+    isMuslim: Boolean(isMuslim),
+    organizationName: String(organizationName || '').trim(),
+    accountType: String(accountType || '').trim(),
+    occupation: '',
+    city: '',
+    address: '',
+    bio: '',
+    avatarUrl: '',
     createdAt: new Date(),
   };
 

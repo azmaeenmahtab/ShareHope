@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState, useContext } from "react";
 import { Bell, ChevronDown, LogOut, User, LayoutDashboard, Menu, X } from "lucide-react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import logoImg from "../../assets/ShareHope.png";
 import { AuthContext } from "../../context/authContext";
 
@@ -16,9 +16,15 @@ export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
+  const location = useLocation();
  
  
   const { user, isLoggedIn, setIsLoggedIn, setUser, loading } = useContext(AuthContext);
+
+  useEffect(() => {
+    setProfileOpen(false);
+    setMobileOpen(false);
+  }, [location.pathname, isLoggedIn]);
 
 const apiBase = import.meta.env.VITE_API_BASE_URL;
 

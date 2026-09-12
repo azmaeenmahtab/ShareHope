@@ -8,6 +8,7 @@ import Signup from './pages/Auth/SignupPage'
  import Requests from './pages/Requests'
 import DonationRequestPage from './pages/DonationRequestPage'
 import TransactionPage from './pages/profile/transaction'
+import MyProfile from './pages/profile/myProfile'
 
 
 export const router = createBrowserRouter([
@@ -47,6 +48,11 @@ export const router = createBrowserRouter([
         path: '/transaction',
         element: <TransactionPage />,
       },
+      {
+        path: '/profile',
+        element: <MyProfile />,
+      },
+     
     ],
   },
 ])
