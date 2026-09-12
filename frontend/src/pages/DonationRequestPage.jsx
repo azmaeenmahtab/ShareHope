@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   HandHeart,
@@ -10,56 +10,27 @@ import {
   Phone,
   User,
   MapPin,
-  Plus,
   X,
-  Building,
-  Users,
   Eye,
-  Clock,
   Sparkles,
   ArrowRight,
   CreditCard,
-  Mail,
   Check,
 } from "lucide-react";
 import Footer from "../components/shared/Footer";
-import DetailsModal from "../components/modals/DetailsModal";
 import Overlay from "../components/Overlay";
 import Toast from "../components/Toast";
-
-// Sample preset images for easy selection by requesters
-const SAMPLE_IMAGES = [
-  {
-    label: "Medical & Emergency",
-    url: "https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?q=80&w=700&auto=format&fit=crop",
-  },
-  {
-    label: "Family & Ration",
-    url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbDiyQOo_Vi-ZIfF0JT3i5OJNtxe26KKchx64WxjfuNQ&s=10",
-  },
-  {
-    label: "Education & Children",
-    url: "https://images.unsplash.com/photo-1497486751825-1233686d5d80?q=80&w=700&auto=format&fit=crop",
-  },
-  {
-    label: "Disaster Relief",
-    url: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=700&auto=format&fit=crop",
-  },
-  {
-    label: "Community & Trust",
-    url: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=700&auto=format&fit=crop",
-  },
-];
+import { AuthContext } from "../context/authContext";
 
 const PRESET_DOCS = [
-  "📄 NID copy",
-  "📄 Doctor's prescription / Note",
-  "📄 Hospital cost estimate",
-  "📄 Imam / Local leader letter",
-  "📄 Income / Unemployment certificate",
-  "📄 Utility bill",
-  "📄 NGO / Trust Certificate",
-  "📄 Student ID",
+  "NID copy",
+  "Doctor's prescription / Note",
+  "Hospital cost estimate",
+  "Imam / Local leader letter",
+  "Income / Unemployment certificate",
+  "Utility bill",
+  "NGO / Trust Certificate",
+  "Student ID",
 ];
 
 const PAYMENT_OPTIONS = [
@@ -70,33 +41,60 @@ const PAYMENT_OPTIONS = [
   { id: "Cash", label: "Cash Collection", color: "border-emerald-200 bg-emerald-50/60 text-emerald-700" },
 ];
 
-import { CATEGORIES } from "../data/cases";
+const CATEGORIES = [
+  "Family support",
+  "Financial support",
+  "Medical & Health",
+  "Education & Tuition",
+  "Food & Monthly Ration",
+  "Disaster & Flood Relief",
+  "Emergency Dialysis",
+  "Orphan Care",
+  "Shelter & Housing",
+  "Others"
+];
+
+const GOAL_PRESETS = [15000, 30000, 50000, 100000, 150000];
+
+const INITIAL_FORM = {
+  name: "",
+  type: "Individual",
+  category: CATEGORIES[0],
+  goal: "",
+  area: "",
+  desc: "",
+  urgent: false,
+  methods: ["bKash", "Nagad", "Bank", "Cash"],
+  docs: ["NID copy", "Imam / Local leader letter"],
+  contactName: "",
+  contactPhone: "",
+  contactEmail: "",
+  relationship: "Self",
+};
+
+const IMGBB_API = import.meta.env.VITE_IMGBB_API || "https://api.imgbb.com/1/upload";
+const IMGBB_SECRET_KEY = import.meta.env.VITE_IMGBB_SECRET_KEY || "1d0e5a39339d17c9208551a82c7e94cc";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000").replace(/\/+$/, "");
 
 export default function DonationRequestPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    type: "Individual",
-    category: "Family support",
-    goal: "",
-    area: "",
-    desc: "",
-    urgent: false,
-    methods: ["bKash", "Nagad", "Bank", "Cash"],
-    docs: ["📄 NID copy", "📄 Imam letter"],
-    image: SAMPLE_IMAGES[0].url,
-    contactName: "",
-    contactPhone: "",
-    contactEmail: "",
-    relationship: "Self",
-  });
+  const { user } = useContext(AuthContext);
 
-  const [customDoc, setCustomDoc] = useState("");
+  const [formData, setFormData] = useState(INITIAL_FORM);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState("");
+  const [submitError, setSubmitError] = useState(null);
   const [submittedData, setSubmittedData] = useState(null);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [toastMsg, setToastMsg] = useState(null);
-  const [name, setName] = useState("")
+
+  // Revoke the object URL when the image changes or the component unmounts
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
 
   const triggerToast = (msg) => {
     setToastMsg(msg);
@@ -117,37 +115,37 @@ export default function DonationRequestPage() {
   const toggleMethod = (methodId) => {
     setFormData((prev) => {
       const exists = prev.methods.includes(methodId);
-      const updated = exists
-        ? prev.methods.filter((m) => m !== methodId)
-        : [...prev.methods, methodId];
-      return { ...prev, methods: updated };
+      return {
+        ...prev,
+        methods: exists
+          ? prev.methods.filter((m) => m !== methodId)
+          : [...prev.methods, methodId],
+      };
     });
   };
 
   const toggleDoc = (docName) => {
     setFormData((prev) => {
       const exists = prev.docs.includes(docName);
-      const updated = exists
-        ? prev.docs.filter((d) => d !== docName)
-        : [...prev.docs, docName];
-      return { ...prev, docs: updated };
+      return {
+        ...prev,
+        docs: exists ? prev.docs.filter((d) => d !== docName) : [...prev.docs, docName],
+      };
     });
   };
 
-  const addCustomDoc = () => {
-    if (!customDoc.trim()) return;
-    const formatted = customDoc.startsWith("📄") ? customDoc.trim() : `📄 ${customDoc.trim()}`;
-    if (!formData.docs.includes(formatted)) {
-      setFormData((prev) => ({ ...prev, docs: [...prev.docs, formatted] }));
-    }
-    setCustomDoc("");
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
-  const removeDoc = (docToRemove) => {
-    setFormData((prev) => ({
-      ...prev,
-      docs: prev.docs.filter((d) => d !== docToRemove),
-    }));
+  const clearImage = () => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImageFile(null);
+    setImagePreview(null);
   };
 
   const validate = () => {
@@ -167,122 +165,154 @@ export default function DonationRequestPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault(); 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("[DonationRequestPage] handleSubmit triggered. Current formData:", formData);
+
+    // If backend requires authentication (verifyTokenMiddleware), check if user is logged in
+    if (!user) {
+      const authError = "You must be logged in to submit a donation request. Please log in first.";
+      console.warn("[DonationRequestPage]", authError);
+      setSubmitError(authError);
+      triggerToast(authError);
+      return;
+    }
+
     if (!validate()) {
+      console.warn("[DonationRequestPage] Validation failed. Current errors:", errors);
       triggerToast("Please fill in all required fields marked in red.");
       return;
     }
 
     setIsSubmitting(true);
+    setSubmitError(null);
+    setUploadStatus("Processing...");
 
-    // Simulate API request processing
-    setTimeout(() => {
-      const generatedId = `SH-${Math.floor(10000 + Math.random() * 90000)}`;
-      const formattedData = {
-        ...formData,
-        id: generatedId,
-        goal: `৳ ${Number(formData.goal).toLocaleString("en-IN")}`,
-        raised: "৳ 0 raised",
-        percent: 0,
-        submitted: "Just now",
-        methods: formData.methods.join(", "),
-        verified: false,
+    try {
+      let imageUrl = "";
+
+      // 1. If an image file was selected, upload it to ImgBB first
+      if (imageFile) {
+        setUploadStatus("Uploading image to ImgBB...");
+        console.log("[DonationRequestPage] Uploading image to ImgBB:", imageFile.name);
+
+        const imgFormData = new FormData();
+        imgFormData.append("image", imageFile);
+
+        let imgbbRes;
+        try {
+          imgbbRes = await fetch(`${IMGBB_API}?key=${IMGBB_SECRET_KEY}`, {
+            method: "POST",
+            body: imgFormData,
+          });
+        } catch (fetchErr) {
+          console.error("[DonationRequestPage] ImgBB network fetch error:", fetchErr);
+          throw new Error("Unable to reach ImgBB server. Please check your internet connection or ad-blocker.");
+        }
+
+        let imgbbData;
+        try {
+          imgbbData = await imgbbRes.json();
+        } catch (jsonErr) {
+          console.error("[DonationRequestPage] ImgBB non-JSON response:", jsonErr);
+          throw new Error(`ImgBB upload failed with HTTP status ${imgbbRes.status}`);
+        }
+
+        if (!imgbbRes.ok || !imgbbData?.success) {
+          console.error("[DonationRequestPage] ImgBB rejected upload:", imgbbData);
+          throw new Error(imgbbData?.error?.message || "Failed to upload image to ImgBB. Please try another image.");
+        }
+
+        imageUrl = imgbbData.data?.url || imgbbData.data?.display_url || "";
+        console.log("[DonationRequestPage] ImgBB upload succeeded. Image URL:", imageUrl);
+      }
+
+      // 2. Submit the request payload with the uploaded image URL to the backend
+      setUploadStatus("Saving request to database...");
+      const payload = {
+        name: formData.name.trim(),
+        type: formData.type,
+        category: formData.category,
+        goal: Number(formData.goal),
+        area: formData.area.trim(),
+        desc: formData.desc.trim(),
+        urgent: Boolean(formData.urgent),
+        methods: formData.methods,
+        docs: formData.docs,
+        contactName: formData.contactName.trim(),
+        contactPhone: formData.contactPhone.trim(),
+        contactEmail: formData.contactEmail.trim(),
+        relationship: formData.relationship,
+        submitterEmail: user?.email || "",
+        image: imageUrl,
       };
 
-      setIsSubmitting(false);
-      setSubmittedData(formattedData);
+      const endpoint = `${API_BASE_URL}/api/request/submit`;
+      console.log(`[DonationRequestPage] Sending POST request to ${endpoint} with payload:`, payload);
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      console.log(`[DonationRequestPage] Backend responded with status: ${res.status}`);
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => null);
+        console.error("[DonationRequestPage] Backend returned error response:", errBody);
+        throw new Error(errBody?.message || `Submission failed with status ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("[DonationRequestPage] Donation request created successfully:", data);
+      setSubmittedData(data.request || data);
       triggerToast("Donation request submitted successfully!");
-    }, 1000);
+    } catch (err) {
+      console.error("[DonationRequestPage] Submission error caught:", err);
+      setSubmitError(err.message);
+      triggerToast(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+      setUploadStatus("");
+    }
   };
 
-  // Preview object for DetailsModal and Live Card
-  // const previewCase = {
-  //   id: submittedData ? submittedData.id : "SH-PREVIEW",
-  //   name: formData.name || "Recipient / Request Title",
-  //   type: formData.type,
-  //   verified: false,
-  //   urgent: formData.urgent,
-  //   image:
-  //     formData.image ||
-  //     "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=700&auto=format&fit=crop",
-  //   desc:
-  //     formData.desc ||
-  //     "Provide details about the cause, family background, medical condition, or urgent need to help donors understand your request.",
-  //   raised: "৳ 0 raised",
-  //   goal: formData.goal ? `৳ ${Number(formData.goal).toLocaleString("en-IN")}` : "৳ 50,000",
-  //   percent: 0,
-  //   area: formData.area || "Area / Location (e.g. Natunbazar, Dhaka)",
-  //   category: formData.category,
-  //   submitted: "Pending Verification",
-  //   methods: formData.methods.length > 0 ? formData.methods.join(", ") : "bKash, Nagad, Bank, Cash",
-  //   docs: formData.docs.length > 0 ? formData.docs : ["📄 Pending verification"],
-  // };
+  const resetForm = () => {
+    setFormData(INITIAL_FORM);
+    clearImage();
+    setErrors({});
+    setSubmittedData(null);
+    setUploadStatus("");
+  };
 
   return (
     <div className="min-h-screen bg-[#FAF9F5] text-slate-800 pb-16 pt-8 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Page Banner / Header */}
-        <div className="mb-8 rounded-3xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden bg-gradient-to-r from-[#2b6658] via-[#3D8D7A] to-[#4fa390]">
-          <div className="absolute -right-10 -bottom-10 w-64 h-64 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-          <div className="absolute right-32 -top-12 w-48 h-48 rounded-full bg-[#B3D8A8]/20 blur-xl pointer-events-none" />
 
-          <div className="relative z-10 max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 text-white text-xs font-semibold backdrop-blur-md mb-4 border border-white/20">
-              <HandHeart className="w-4 h-4 text-[#FBFFE4]" />
-              <span>ShareHope Support Request Portal</span>
-            </div>
-
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">
-              Submit a Donation Request
-            </h1>
-            <p className="text-white/90 text-sm sm:text-base leading-relaxed">
-              If you or someone you know requires emergency medical, financial, or relief assistance,
-              fill out the form below. ShareHope verifies each case to ensure 100% transparency for our donor community.
-            </p>
-
-            {/* Quick stats trust bar */}
-            <div className="mt-6 flex flex-wrap gap-4 text-xs font-medium text-white/80 border-t border-white/15 pt-4">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-[#B3D8A8]" /> 24-48h Verification
-              </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#B3D8A8]" /> Direct Mobile & Bank Transfers
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-[#FBFFE4]" /> 0% Platform Commission
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Grid: Form (Left) & Live Preview / Guidelines (Right) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Form Container */}
-          <div className="lg:col-span-12 max-w-4xl mx-auto w-full bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-5 mb-6">
-              <div>
-                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-[#3D8D7A]" /> Request Information Form
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                  Fields marked with <span className="text-red-500">*</span> are mandatory for verification.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowPreviewModal(true)}
-                className="lg:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 hover:bg-slate-100"
-              >
-                <Eye className="w-3.5 h-3.5 text-[#3D8D7A]" /> Preview
-              </button>
+          {/* Form */}
+          <div className="lg:col-span-7 w-full bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm">
+            <div className="border-b border-slate-100 pb-5 mb-6">
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-[#3D8D7A]" /> Request Information Form
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                Fields marked with <span className="text-red-500">*</span> are mandatory for
+                verification.
+              </p>
             </div>
+
+            {submitError && (
+              <div className="mb-5 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs text-red-700">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>{submitError}</span>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              
-              {/* SECTION 1: GENERAL INFORMATION */}
+              {/* 1. Beneficiary & Category */}
               <div className="space-y-4">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#3D8D7A] flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5" /> 1. Beneficiary & Category
@@ -297,7 +327,7 @@ export default function DonationRequestPage() {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    placeholder="e.g. Karim Family — A warrior father or Fahim — Emergency Dialysis"
+                    placeholder="e.g. Karim Family — Emergency Dialysis"
                     className={`w-full px-4 py-3 rounded-xl border text-sm text-slate-800 bg-white placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-[#3D8D7A]/30 ${
                       errors.name ? "border-red-300 bg-red-50/30" : "border-slate-200"
                     }`}
@@ -310,49 +340,38 @@ export default function DonationRequestPage() {
                     <label className="block text-sm font-semibold text-slate-700 mb-1">
                       Recipient Type <span className="text-red-500">*</span>
                     </label>
-                    <div className="relative">
-                      <select
-                        name="type"
-                        value={formData.type}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-[#3D8D7A]/30 appearance-none"
-                      >
-                        <option value="Individual">Individual</option>
-                        <option value="Family">Family</option>
-                        <option value="Organization">Organization</option>
-                        <option value="Community">Community</option>
-                      </select>
-                      <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                        ▼
-                      </div>
-                    </div>
+                    <select
+                      name="type"
+                      value={formData.type}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-[#3D8D7A]/30"
+                    >
+                      <option value="Individual">Individual</option>
+                      <option value="Family">Family</option>
+                      <option value="Organization">Organization</option>
+                      <option value="Community">Community</option>
+                    </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1">
                       Category <span className="text-red-500">*</span>
                     </label>
-                    <div className="relative">
-                      <select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-[#3D8D7A]/30 appearance-none"
-                      >
-                        {CATEGORIES.map((cat) => (
-                          <option key={cat} value={cat}>
-                            {cat}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                        ▼
-                      </div>
-                    </div>
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 bg-white outline-none focus:ring-2 focus:ring-[#3D8D7A]/30"
+                    >
+                      {CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
-                {/* Urgency Toggle */}
                 <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 flex items-center justify-between gap-4">
                   <div className="flex items-start gap-3">
                     <div className="p-2 rounded-xl bg-red-100 text-red-600 shrink-0 mt-0.5">
@@ -363,7 +382,8 @@ export default function DonationRequestPage() {
                         Is this an Urgent Emergency Request?
                       </span>
                       <p className="text-xs text-slate-500">
-                        Check this if assistance is needed within 24–72 hours (e.g. ICU treatment, natural disaster).
+                        Check this if assistance is needed within 24–72 hours (e.g. ICU treatment,
+                        natural disaster).
                       </p>
                     </div>
                   </div>
@@ -382,7 +402,7 @@ export default function DonationRequestPage() {
 
               <hr className="border-slate-100 my-6" />
 
-              {/* SECTION 2: FINANCIAL & LOCATION */}
+              {/* 2. Target Goal & Location */}
               <div className="space-y-4">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#3D8D7A] flex items-center gap-1.5">
                   <CreditCard className="w-3.5 h-3.5" /> 2. Target Goal & Location
@@ -409,10 +429,9 @@ export default function DonationRequestPage() {
                       />
                     </div>
                     {errors.goal && <p className="mt-1 text-xs text-red-500 font-medium">{errors.goal}</p>}
-                    
-                    {/* Goal presets */}
+
                     <div className="flex flex-wrap gap-1.5 mt-2">
-                      {[15000, 30000, 50000, 100000, 150000].map((amt) => (
+                      {GOAL_PRESETS.map((amt) => (
                         <button
                           key={amt}
                           type="button"
@@ -446,7 +465,6 @@ export default function DonationRequestPage() {
                   </div>
                 </div>
 
-                {/* Preferred Payment Methods */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Accepted Payment Channels <span className="text-red-500">*</span>
@@ -465,7 +483,7 @@ export default function DonationRequestPage() {
                               : "border-slate-200 bg-white text-slate-500 hover:border-slate-300"
                           }`}
                         >
-                          {isSelected ? <Check className="w-3.5 h-3.5" /> : null}
+                          {isSelected && <Check className="w-3.5 h-3.5" />}
                           {opt.label}
                         </button>
                       );
@@ -477,7 +495,7 @@ export default function DonationRequestPage() {
 
               <hr className="border-slate-100 my-6" />
 
-              {/* SECTION 3: DESCRIPTION & STORY */}
+              {/* 3. Description */}
               <div className="space-y-4">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#3D8D7A] flex items-center gap-1.5">
                   <FileText className="w-3.5 h-3.5" /> 3. Detailed Request Story
@@ -501,7 +519,9 @@ export default function DonationRequestPage() {
                     {errors.desc ? (
                       <p className="text-xs text-red-500 font-medium">{errors.desc}</p>
                     ) : (
-                      <p className="text-[11px] text-slate-400">Be honest and specific. Clear stories get verified 2x faster.</p>
+                      <p className="text-[11px] text-slate-400">
+                        Be honest and specific. Clear stories get verified faster.
+                      </p>
                     )}
                     <span className="text-[11px] text-slate-400">{formData.desc.length} chars</span>
                   </div>
@@ -510,18 +530,17 @@ export default function DonationRequestPage() {
 
               <hr className="border-slate-100 my-6" />
 
-              {/* SECTION 4: VERIFICATION DOCUMENTS & IMAGE */}
+              {/* 4. Verification Docs & Photo */}
               <div className="space-y-4">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#3D8D7A] flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5" /> 4. Verification Proof & Photo
                 </h3>
 
-                {/* Preset Doc Badges */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                     Available Verification Documents
                   </label>
-                  <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="flex flex-wrap gap-2">
                     {PRESET_DOCS.map((doc) => {
                       const isSelected = formData.docs.includes(doc);
                       return (
@@ -540,92 +559,35 @@ export default function DonationRequestPage() {
                       );
                     })}
                   </div>
-
-                  {/* Added Doc tags */}
-                  {/* <div className="flex flex-wrap items-center gap-2 p-3 rounded-2xl border border-slate-200 bg-slate-50"> */}
-                    {/* <span className="text-xs font-bold text-slate-500">Selected Docs:</span> */}
-                    {/* {formData.docs.map((doc) => (
-                      <span
-                        key={doc}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-200 bg-white text-xs font-medium text-slate-700 shadow-2xs"
-                      >
-                        {doc}
-                        <button
-                          type="button"
-                          onClick={() => removeDoc(doc)}
-                          className="text-slate-400 hover:text-red-500 transition"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-
-                    <div className="flex items-center gap-1 mt-1 sm:mt-0 w-full sm:w-auto">
-                      <input
-                        type="text"
-                        value={customDoc}
-                        onChange={(e) => setCustomDoc(e.target.value)}
-                        placeholder="Add custom doc tag..."
-                        className="px-2.5 py-1 text-xs rounded-lg border border-slate-200 bg-white outline-none focus:border-[#3D8D7A]"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            addCustomDoc();
-                          }
-                        }}
-                      /> */}
-                      {/* <button
-                        type="button"
-                        onClick={addCustomDoc}
-                        className="p-1 rounded-lg bg-[#3D8D7A] text-white hover:bg-[#2b6658]"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button> */}
-                    {/* </div> */}
-                  {/* </div> */}
                 </div>
 
-                {/* Photo selection */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                    Cover Photo (Choose preset or enter custom image URL)
-                  </label>
-                  
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-3">
-                    {SAMPLE_IMAGES.map((img) => {
-                      const isSelected = formData.image === img.url;
-                      return (
-                        <button
-                          key={img.label}
-                          type="button"
-                          onClick={() => setFormData((prev) => ({ ...prev, image: img.url }))}
-                          className={`relative h-20 rounded-xl overflow-hidden border-2 transition ${
-                            isSelected ? "border-[#3D8D7A] ring-2 ring-[#3D8D7A]/30 scale-[1.02]" : "border-transparent opacity-70 hover:opacity-100"
-                          }`}
-                        >
-                          <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-black/40 flex items-end p-1 text-[10px] text-white font-medium truncate">
-                            {img.label}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Cover Photo</label>
 
-                  <input
-                    type="text"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleInputChange}
-                    placeholder="Or paste image URL (https://...)"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 bg-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#3D8D7A]/30"
-                  />
+                  {imagePreview ? (
+                    <div className="relative h-40 w-full sm:w-56 rounded-xl overflow-hidden border border-slate-200">
+                      <img src={imagePreview} alt="Cover preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={clearImage}
+                        className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white hover:bg-black/80"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center gap-1.5 h-40 w-full sm:w-56 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/70 text-slate-400 cursor-pointer hover:border-[#3D8D7A] hover:text-[#3D8D7A] transition">
+                      <Upload className="w-5 h-5" />
+                      <span className="text-xs font-medium">Upload a photo</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                    </label>
+                  )}
                 </div>
               </div>
 
               <hr className="border-slate-100 my-6" />
 
-              {/* SECTION 5: SUBMITTER CONTACT DETAILS */}
+              {/* 5. Submitter Contact */}
               <div className="space-y-4">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#3D8D7A] flex items-center gap-1.5">
                   <Phone className="w-3.5 h-3.5" /> 5. Submitter & Verification Contact
@@ -706,7 +668,6 @@ export default function DonationRequestPage() {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <div className="pt-4">
                 <button
                   type="submit"
@@ -716,7 +677,7 @@ export default function DonationRequestPage() {
                   {isSubmitting ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Submitting Request...</span>
+                      <span>{uploadStatus || "Submitting Request..."}</span>
                     </>
                   ) : (
                     <>
@@ -727,118 +688,106 @@ export default function DonationRequestPage() {
                   )}
                 </button>
                 <p className="text-center text-xs text-slate-400 mt-2.5">
-                  By submitting, you confirm that all attached information and documents are authentic.
+                  By submitting, you confirm that all attached information and documents are
+                  authentic.
                 </p>
               </div>
             </form>
           </div>
 
-          {/* Right Column: Live Card Preview & Verification Guide (Disabled/Commented Out) */}
-          {false && (
-            <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
-              
-              {/* Live Card Card */}
-              <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-                      Live Request Preview
-                    </h3>
-                  </div>
-                  <span className="text-[11px] font-medium text-slate-400">Updates in real time</span>
+          {/* Live summary card */}
+          <div className="lg:col-span-5 lg:sticky lg:top-24">
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+                    Live Preview
+                  </h3>
                 </div>
+                <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
+                  <Eye className="w-3.5 h-3.5" /> Donor view
+                </span>
+              </div>
 
-                <p className="text-xs text-slate-500">
-                  This is how your donation request card will look to donors on the main ShareHope feed once approved:
-                </p>
-
-                {/* Donation Card Mock */}
-                <div
-                  className={`rounded-2xl border border-slate-200 p-4 bg-white shadow-sm transition-all ${
-                    formData.urgent ? "border-l-4 border-l-red-500" : ""
-                  }`}
-                >
-                  <div className="flex gap-3 max-[500px]:flex-col">
-                    <img
-                      src={previewCase.image}
-                      alt=""
-                      className="h-24 w-24 flex-shrink-0 rounded-xl bg-slate-100 object-cover max-[500px]:w-full max-[500px]:h-36"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <h4 className="font-bold text-slate-900 text-sm sm:text-base line-clamp-1">
-                          {previewCase.name}
-                        </h4>
-                        {formData.urgent ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-red-50 border border-red-200 px-2 py-0.5 text-[10px] font-semibold text-red-600 shrink-0">
-                            Urgent
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-semibold text-amber-700 shrink-0">
-                            Pending
-                          </span>
-                        )}
+              <div
+                className={`rounded-2xl border border-slate-200 p-4 bg-white transition-all ${
+                  formData.urgent ? "border-l-4 border-l-red-500" : ""
+                }`}
+              >
+                <div className="flex gap-3 max-[500px]:flex-col">
+                  <div className="h-24 w-24 flex-shrink-0 rounded-xl bg-slate-100 overflow-hidden max-[500px]:w-full max-[500px]:h-36">
+                    {imagePreview ? (
+                      <img src={imagePreview} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-300">
+                        <HandHeart className="w-8 h-8" />
                       </div>
-
-                      <p className="mt-1 line-clamp-2 text-xs text-slate-600 leading-snug">
-                        {previewCase.desc}
-                      </p>
-
-                      <div className="mt-3 relative h-2 w-full overflow-hidden rounded-full bg-slate-100 border border-slate-200">
-                        <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-[#3D8D7A] w-[0%]" />
-                      </div>
-
-                      <div className="mt-1.5 flex items-baseline justify-between text-xs">
-                        <span className="font-mono font-bold text-[#3D8D7A]">৳ 0 raised</span>
-                        <span className="text-slate-500">
-                          of <span className="font-mono font-medium text-slate-700">{previewCase.goal}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <h4 className="font-bold text-slate-900 text-sm sm:text-base line-clamp-1">
+                        {formData.name || "Recipient / Request Title"}
+                      </h4>
+                      {formData.urgent ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-red-50 border border-red-200 px-2 py-0.5 text-[10px] font-semibold text-red-600 shrink-0">
+                          Urgent
                         </span>
-                      </div>
-
-                      <div className="mt-3 flex items-center justify-between text-xs">
-                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600 font-medium">
-                          {formData.type} · {formData.category}
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-semibold text-amber-700 shrink-0">
+                          Pending
                         </span>
-
-                        <button
-                          type="button"
-                          onClick={() => setShowPreviewModal(true)}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-[#3D8D7A] hover:underline"
-                        >
-                          <Eye className="w-3.5 h-3.5" /> Full Modal
-                        </button>
-                      </div>
+                      )}
                     </div>
-                  </div>
-                </div>
 
-                <div className="pt-2 text-center">
-                  <button
-                    type="button"
-                    onClick={() => setShowPreviewModal(true)}
-                    className="w-full py-2.5 px-4 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-700 hover:bg-slate-100 hover:border-slate-300 transition flex items-center justify-center gap-2"
-                  >
-                    <Eye className="w-4 h-4 text-[#3D8D7A]" />
-                    <span>Open Full Details Modal Preview</span>
-                  </button>
+                    <p className="mt-1 line-clamp-2 text-xs text-slate-600 leading-snug">
+                      {formData.desc ||
+                        "Your description will appear here once you fill in the request story."}
+                    </p>
+
+                    <div className="mt-3 relative h-2 w-full overflow-hidden rounded-full bg-slate-100 border border-slate-200">
+                      <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-[#3D8D7A] w-0" />
+                    </div>
+
+                    <div className="mt-1.5 flex items-baseline justify-between text-xs">
+                      <span className="font-mono font-bold text-[#3D8D7A]">৳ 0 raised</span>
+                      <span className="text-slate-500">
+                        of{" "}
+                        <span className="font-mono font-medium text-slate-700">
+                          {formData.goal ? `৳ ${Number(formData.goal).toLocaleString("en-IN")}` : "৳ —"}
+                        </span>
+                      </span>
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between text-xs">
+                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600 font-medium">
+                        {formData.type} · {formData.category}
+                      </span>
+                    </div>
+
+                    {formData.area && (
+                      <p className="mt-2 flex items-center gap-1 text-[11px] text-slate-400">
+                        <MapPin className="w-3 h-3" /> {formData.area}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Verification Process Info Card */}
-              <div className="bg-[#FBFFE4] rounded-3xl p-6 border border-[#B3D8A8]/60 shadow-sm space-y-4">
+              <div className="bg-[#FBFFE4] rounded-2xl p-4 border border-[#B3D8A8]/60 space-y-3">
                 <div className="flex items-center gap-2 text-[#2b6658]">
-                  <ShieldCheck className="w-5 h-5" />
-                  <h3 className="text-sm font-bold uppercase tracking-wider">How Verification Works</h3>
+                  <ShieldCheck className="w-4 h-4" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider">How Verification Works</h3>
                 </div>
-
-                <ul className="space-y-3 text-xs text-slate-700">
+                <ul className="space-y-2.5 text-xs text-slate-700">
                   <li className="flex items-start gap-2.5">
                     <div className="w-5 h-5 rounded-full bg-[#3D8D7A] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
                       1
                     </div>
                     <span>
-                      <strong>Submission:</strong> Your case details and proof documents are encrypted and saved securely.
+                      <strong>Submission:</strong> Your case details and proof documents are
+                      encrypted and saved securely.
                     </span>
                   </li>
                   <li className="flex items-start gap-2.5">
@@ -846,7 +795,8 @@ export default function DonationRequestPage() {
                       2
                     </div>
                     <span>
-                      <strong>Phone Call Verification:</strong> A ShareHope field auditor will call your provided number within 24 hours.
+                      <strong>Phone Call Verification:</strong> A ShareHope field auditor will call
+                      your provided number within 24 hours.
                     </span>
                   </li>
                   <li className="flex items-start gap-2.5">
@@ -854,30 +804,20 @@ export default function DonationRequestPage() {
                       3
                     </div>
                     <span>
-                      <strong>Live Publishing:</strong> Once verified, your campaign goes live with a <span className="font-bold text-emerald-700">Verified Badge</span> for thousands of donors to view.
+                      <strong>Live Publishing:</strong> Once verified, your campaign goes live for
+                      donors to view.
                     </span>
                   </li>
                 </ul>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
       <Footer />
 
-      {/* Interactive Details Modal Preview */}
-      {showPreviewModal && (
-        <DetailsModal
-          data={previewCase}
-          open={showPreviewModal}
-          onClose={() => setShowPreviewModal(false)}
-          onReport={() => triggerToast("Preview Mode: Reporting is disabled during draft.")}
-          onProceed={() => triggerToast("Preview Mode: Payment flow triggers when published.")}
-        />
-      )}
-
-      {/* Submission Success Confirmation Modal */}
+      {/* Submission success modal */}
       {submittedData && (
         <Overlay open={!!submittedData} onClose={() => setSubmittedData(null)}>
           <div className="p-6 sm:p-8 text-center space-y-5 max-w-md mx-auto">
@@ -886,41 +826,45 @@ export default function DonationRequestPage() {
             </div>
 
             <div>
-              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold uppercase tracking-wider inline-block mb-2">
-                ID: {submittedData.id}
-              </span>
-              <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
-                Request Submitted!
-              </h3>
+              {(submittedData.id || submittedData._id) && (
+                <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold uppercase tracking-wider inline-block mb-2">
+                  ID: {submittedData.id || submittedData._id}
+                </span>
+              )}
+              <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">Request Submitted!</h3>
               <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                Thank you, <strong>{submittedData.contactName}</strong>. Your request for{" "}
-                <strong>"{submittedData.name}"</strong> has been recorded and queued for verification.
+                Thank you, <strong>{formData.contactName}</strong>. Your request for{" "}
+                <strong>"{formData.name}"</strong> has been recorded and queued for verification.
               </p>
             </div>
 
             <div className="rounded-2xl bg-slate-50 border border-slate-200 p-4 text-left space-y-2 text-xs text-slate-700">
               <div className="flex justify-between">
                 <span className="text-slate-400 font-medium">Goal Amount:</span>
-                <span className="font-mono font-bold text-[#3D8D7A]">{submittedData.goal}</span>
+                <span className="font-mono font-bold text-[#3D8D7A]">
+                  ৳ {Number(formData.goal).toLocaleString("en-IN")}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400 font-medium">Category / Area:</span>
-                <span className="font-semibold">{submittedData.category} ({submittedData.area})</span>
+                <span className="font-semibold">
+                  {formData.category} ({formData.area})
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400 font-medium">Contact Phone:</span>
-                <span className="font-mono">{submittedData.contactPhone}</span>
+                <span className="font-mono">{formData.contactPhone}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400 font-medium">Docs Provided:</span>
-                <span className="font-semibold">{submittedData.docs.length} document(s)</span>
+                <span className="font-semibold">{formData.docs.length} document(s)</span>
               </div>
             </div>
 
             <div className="pt-2 flex flex-col sm:flex-row gap-3">
               <button
                 type="button"
-                onClick={() => setSubmittedData(null)}
+                onClick={resetForm}
                 className="flex-1 py-3 px-4 rounded-full border border-slate-300 bg-white text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm"
               >
                 Submit Another
@@ -937,7 +881,6 @@ export default function DonationRequestPage() {
         </Overlay>
       )}
 
-      {/* Toast Notification */}
       <Toast message={toastMsg} />
     </div>
   );

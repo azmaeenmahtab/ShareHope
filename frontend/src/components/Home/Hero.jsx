@@ -67,7 +67,7 @@ const HeroSection = () => {
         style={{ background: "radial-gradient(circle, #E3F1EA 0%, transparent 70%)" }}
       />
 
-      <div className="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-10 md:py-16 lg:py-20">
+      <div className="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-8 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
           {/* Left Column: Mission, Headlines & CTAs */}
@@ -75,9 +75,9 @@ const HeroSection = () => {
             
             {/* Main Headline */}
             <div className="space-y-4">
-              <h1 className="text-4xl sm:text-5xl lg:text-[52px] font-extrabold tracking-tight leading-[1.14] text-[#0D5C46]">
+              <h1 className="text-4xl sm:text-5xl lg:text-[50px] font-extrabold tracking-tight leading-[1.14] text-[#0D5C46]">
                 Connecting Hearts, <br />
-                <span className="text-[#14795D]">
+                <span className="text-[#14795D] ">
                   Relieving Suffering.
                 </span>
               </h1>

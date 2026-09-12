@@ -48,13 +48,17 @@ export default function DetailsModal({ data, open, onClose, onReport, onProceed 
           <div className="relative h-2.5 w-full overflow-hidden rounded-full border border-slate-200 bg-slate-100">
             <div
               className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-[#3D8D7A]"
-              style={{ width: `${data.percent}%` }}
+              style={{ width: `${Math.min(100, Math.max(0, data.percent || 0))}%` }}
             />
           </div>
           <div className="mt-2 flex items-baseline justify-between text-xs sm:text-sm">
-            <span className="font-mono font-bold text-[#3D8D7A]">{data.raised}</span>
+            <span className="font-mono font-bold text-[#3D8D7A]">
+              {typeof data.raised === "number" ? `৳ ${data.raised.toLocaleString("en-IN")} raised` : (data.raised || "৳ 0 raised")}
+            </span>
             <span className="text-slate-500">
-              of <span className="font-mono font-medium text-slate-700">{data.goal}</span> goal
+              of <span className="font-mono font-medium text-slate-700">
+                {typeof data.goal === "number" ? `৳ ${data.goal.toLocaleString("en-IN")}` : (data.goal || "—")}
+              </span> goal
             </span>
           </div>
         </div>
@@ -62,19 +66,23 @@ export default function DetailsModal({ data, open, onClose, onReport, onProceed 
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-2xl bg-slate-50 p-4 border border-slate-100">
           <div>
             <dt className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">Area</dt>
-            <dd className="text-xs sm:text-sm font-semibold text-slate-800">{data.area}</dd>
+            <dd className="text-xs sm:text-sm font-semibold text-slate-800">{data.area || "N/A"}</dd>
           </div>
           <div>
             <dt className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">Category</dt>
-            <dd className="text-xs sm:text-sm font-semibold text-slate-800">{data.category}</dd>
+            <dd className="text-xs sm:text-sm font-semibold text-slate-800">{data.category || "General"}</dd>
           </div>
           <div>
             <dt className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">Submitted</dt>
-            <dd className="text-xs sm:text-sm font-semibold text-slate-800">{data.submitted}</dd>
+            <dd className="text-xs sm:text-sm font-semibold text-slate-800">
+              {data.submitted || (data.createdAt ? new Date(data.createdAt).toLocaleDateString("en-GB") : "Recently")}
+            </dd>
           </div>
           <div>
             <dt className="mb-0.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">Payment methods</dt>
-            <dd className="text-xs sm:text-sm font-semibold text-slate-800">{data.methods}</dd>
+            <dd className="text-xs sm:text-sm font-semibold text-slate-800">
+              {Array.isArray(data.methods) ? data.methods.join(", ") : (data.methods || "bKash, Nagad")}
+            </dd>
           </div>
         </dl>
 
@@ -83,9 +91,9 @@ export default function DetailsModal({ data, open, onClose, onReport, onProceed 
             Verification documents
           </span>
           <div className="flex flex-wrap gap-2">
-            {data.docs.map((doc) => (
+            {(Array.isArray(data.docs) && data.docs.length > 0 ? data.docs : ["📄 Document proof on file"]).map((doc, i) => (
               <span
-                key={doc}
+                key={i}
                 className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700"
               >
                 {doc}
