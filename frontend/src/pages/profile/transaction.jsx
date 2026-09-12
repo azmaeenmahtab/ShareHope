@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, Banknote, HeartHandshake, LoaderCircle, RefreshCw } from "lucide-react";
 
-const formatMoney = (value) => `৳ ${Number(value || 0).toLocaleString("en-BD")}`;
+const formatMoney =(value)=>`৳ ${Number(value || 0).toLocaleString("en-BD")}`;
+const WALLET_METHODS = new Set(["bkash", "nagad", "rocket"]);
+
+const isWalletPayment = (method) => WALLET_METHODS.has(String(method || "").toLowerCase().trim());
 
 const getSavedZakatAmount = () => {
   try {
@@ -39,9 +42,11 @@ function SummaryCard({ label, value, detail, tone = "green", icon: Icon }) {
   );
 }
 
-function TransactionCard({ transaction, direction }) {
+function TransactionCard({ transaction, direction, onConfirm }) {
   const isGiven = direction === "given";
   const counterpartyLabel = isGiven ? "Given to" : "Received from";
+  const showTransactionId = isWalletPayment(transaction.paymentMethod);
+  const isPending = transaction.status !== "confirmed";
 
   return (
     <article className="rounded-2xl border border-[#DDEBE5] bg-white p-5 shadow-sm">
@@ -71,19 +76,36 @@ function TransactionCard({ transaction, direction }) {
           <p className="mt-1 font-semibold text-slate-700">{transaction.paymentMethod || "Not specified"}</p>
         </div>
         <div>
-          <p className="text-slate-400">Transaction ID</p>
-          <p className="mt-1 truncate font-semibold text-slate-700">{transaction.transactionId || "Pending confirmation"}</p>
+          <p className="text-slate-400">Status</p>
+          <p className={`mt-1 font-semibold ${isPending ? "text-amber-600" : "text-emerald-700"}`}>
+            {isPending ? "Pending confirmation" : "Confirmed"}
+          </p>
         </div>
         <div>
           <p className="text-slate-400">Date</p>
           <p className="mt-1 font-semibold text-slate-700">{new Date(transaction.createdAt).toLocaleDateString()}</p>
         </div>
       </div>
+      {showTransactionId && (
+        <div className="mt-3 border-t border-slate-100 pt-3 text-xs">
+          <p className="text-slate-400">Transaction ID</p>
+          <p className="mt-1 truncate font-semibold text-slate-700">{transaction.transactionId || "Not provided"}</p>
+        </div>
+      )}
+      {!isGiven && isPending && onConfirm && (
+        <button
+          type="button"
+          onClick={() => onConfirm(transaction._id)}
+          className="mt-4 w-full rounded-xl bg-[#0D5C46] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#094433]"
+        >
+          Confirm payment received
+        </button>
+      )}
     </article>
   );
 }
 
-function TransactionList({ transactions, direction }) {
+function TransactionList({ transactions, direction, onConfirm }) {
   if (!transactions.length) {
     return (
       <div className="rounded-2xl border border-dashed border-[#CFE1DA] bg-white px-6 py-10 text-center">
@@ -94,7 +116,7 @@ function TransactionList({ transactions, direction }) {
     );
   }
 
-  return <div className="space-y-3">{transactions.map((transaction) => <TransactionCard key={transaction._id} transaction={transaction} direction={direction} />)}</div>;
+  return <div className="space-y-3">{transactions.map((transaction) => <TransactionCard key={transaction._id} transaction={transaction} direction={direction} onConfirm={onConfirm} />)}</div>;
 }
 
 export default function TransactionPage() {
@@ -102,6 +124,21 @@ export default function TransactionPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeView, setActiveView] = useState("given");
+
+  const confirmReceived = async (transactionId) => {
+    try {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+      const response = await fetch(`${apiBase}/api/transactions/${transactionId}/confirm`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Unable to confirm transaction");
+      setTransactions((current) => current.map((item) => item._id === transactionId ? { ...item, status: "confirmed" } : item));
+    } catch (confirmError) {
+      setError(confirmError.message);
+    }
+  };
 
   const fetchTransactions = async () => {
     setLoading(true);
@@ -192,7 +229,7 @@ export default function TransactionPage() {
                 <SummaryCard label="Total received" value={totalTaken} detail="Confirmed and pending receipts" tone="blue" icon={ArrowDownLeft} />
                 <SummaryCard label="Amount left" value={Math.max(requestedTotal - totalTaken, 0)} detail={requestedTotal ? `Across recorded request goals: ${formatMoney(requestedTotal)}` : "Request goals will appear with received records"} tone="gold" icon={Banknote} />
               </div>
-              <div className="mt-5"><TransactionList transactions={takenTransactions} direction="taken" /></div>
+              <div className="mt-5"><TransactionList transactions={takenTransactions} direction="taken" onConfirm={confirmReceived} /></div>
             </section>}
           </div>
         )}

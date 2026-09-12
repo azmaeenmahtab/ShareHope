@@ -1,4 +1,4 @@
-const { getTransactions, createTransaction } = require('../services/transactionService');
+const { getTransactions, createTransaction, confirmTransaction } = require('../services/transactionService');
 
 const getTransactionsController = async (req, res) => {
   try {
@@ -18,4 +18,13 @@ const createTransactionController = async (req, res) => {
   }
 };
 
-module.exports = { getTransactionsController, createTransactionController };
+const confirmTransactionController = async (req, res) => {
+  try {
+    const transaction = await confirmTransaction(req.user.id, req.params.id);
+    return res.status(200).json({ success: true, transaction });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message || 'Unable to confirm transaction' });
+  }
+};
+
+module.exports = { getTransactionsController, createTransactionController, confirmTransactionController };

@@ -130,6 +130,7 @@ export default function Requests() {
         requestId: selectedRequest?.id,
         counterpartyId: selectedRequest?.id,
         counterpartyName: selectedRequest?.name,
+        receiverId: selectedRequest?.receiverId || selectedRequest?.userId || selectedRequest?.ownerId,
         direction: "given",
       }),
     });
