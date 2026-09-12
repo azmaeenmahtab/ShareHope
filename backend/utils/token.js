@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const db = require('../db');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'sharehope_jwt_secret_key_2026_secure';
+const JWT_SECRET = process.env.JWT_SECRET ;
 const TOKEN_COLLECTION = 'authorizedToken';
 
 const assignNewTokenService = async (user) => {
