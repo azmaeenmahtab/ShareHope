@@ -1,10 +1,21 @@
-const { getDonationRequestsCollection } = require('../db');
+
+
+const db = require('../db');
 
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=700&auto=format&fit=crop';
+const REQUESTS_COLLECTION = 'requests';
 
 const normalizeArrayField = (value) => {
   if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean);
   if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed.map((item) => String(item).trim()).filter(Boolean);
+      }
+    } catch {
+      // not a JSON array string
+    }
     return value
       .split(',')
       .map((item) => item.trim())
@@ -31,6 +42,7 @@ function normalizeRequestPayload(payload = {}) {
   const contactPhone = String(payload.contactPhone || '').trim();
   const contactEmail = String(payload.contactEmail || '').trim();
   const relationship = String(payload.relationship || 'Self').trim() || 'Self';
+  const submitterEmail = String(payload.submitterEmail || '').trim();
   const methods = [...new Set(normalizeArrayField(payload.methods))];
   const docs = normalizeDocList(payload.docs);
   const image = String(payload.image || '').trim() || DEFAULT_IMAGE;
@@ -79,21 +91,29 @@ function normalizeRequestPayload(payload = {}) {
     contactPhone,
     contactEmail,
     relationship,
+    submitterEmail: submitterEmail || undefined,
     verified: false,
     raised: '৳ 0 raised',
     percent: 0,
     submitted: 'Just now',
+    createdAt: new Date(),
   };
 }
 
 async function createRequestService(payload = {}) {
   const normalizedRequest = normalizeRequestPayload(payload);
 
-  const collection = getDonationRequestsCollection();
-
-  if (!collection) {
-    return normalizedRequest;
+  let database = db.getDb();
+  if (!database) {
+    console.log('[requestService] Database not yet initialized, attempting to connect...');
+    database = await db.connectDB();
   }
+  if (!database) {
+    throw new Error('Database is not connected. Please try again in a moment.');
+  }
+
+  const collection = database.collection(REQUESTS_COLLECTION);
+
 
   try {
     const result = await collection.insertOne(normalizedRequest);

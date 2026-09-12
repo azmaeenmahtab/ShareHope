@@ -42,6 +42,10 @@ export const router = createBrowserRouter([
         path: '/donation-request',
         element: <DonationRequestPage />,
       },
+      {
+        path: '/transactions',
+        element: <DonationRequestPage />,
+      },
     ],
   },
 ])
