@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState, useContext } from "react";
 import { Bell, ChevronDown, LogOut, User, LayoutDashboard, ClipboardList, Menu, X } from "lucide-react";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Link, NavLink, Navigate, useLocation } from "react-router-dom";
 import logoImg from "../../assets/ShareHope.png";
 import { AuthContext } from "../../context/authContext";
 
@@ -101,13 +101,20 @@ export default function Navbar() {
           {/* Desktop nav links */}
           <nav className="hidden md:flex items-center gap-1.5">
             {NAV_LINKS.map((link) => (
-              <Link
+              <NavLink
                 key={link.label}
                 to={link.href}
-                className="px-3.5 py-2 rounded-xl text-sm font-medium text-[#334E44] hover:text-[#0D5C46] hover:bg-[#EAF4F0] transition-all"
+                end
+                className={({ isActive }) =>
+                  `px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
+                    isActive
+                      ? "bg-[#DDF1E8] text-[#0D5C46]"
+                      : "text-[#334E44] hover:text-[#0D5C46] hover:bg-[#EAF4F0]"
+                  }`
+                }
               >
                 {link.label}
-              </Link>
+              </NavLink>
             ))}
           </nav>
 
@@ -238,14 +245,21 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="md:hidden border-t border-[#E5EFEA] px-5 py-4 space-y-1 bg-[#FAF8F5]">
           {NAV_LINKS.map((link) => (
-            <Link
+            <NavLink
               key={link.label}
               to={link.href}
               onClick={() => setMobileOpen(false)}
-              className="block px-3 py-2.5 rounded-xl text-sm font-medium text-[#2D473E] hover:bg-[#EAF4F0] hover:text-[#0D5C46]"
+              end
+              className={({ isActive }) =>
+                `block px-3 py-2.5 rounded-xl text-sm font-medium ${
+                  isActive
+                    ? "bg-[#DDF1E8] text-[#0D5C46]"
+                    : "text-[#2D473E] hover:bg-[#EAF4F0] hover:text-[#0D5C46]"
+                }`
+              }
             >
               {link.label}
-            </Link>
+            </NavLink>
           ))}
 
           {isLoggedIn && (
