@@ -221,30 +221,7 @@ export default function CarbonFootprintDisplay() {
               </div>
             </div>
           </div>
-
-          {/* Footer note */}
-          <p
-            style={{
-              fontSize: "10px",
-              color: "#94a3b8",
-              marginTop: "12px",
-              lineHeight: "1.4",
-              textAlign: "center",
-            }}
-          >
-            Estimates based on network data transfer during this session
-            <br />
-            using the{" "}
-            <a
-              href="https://sustainablewebdesign.org/calculating-digital-emissions/"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "#0D5C46", textDecoration: "underline" }}
-            >
-              Sustainable Web Design
-            </a>{" "}
-            model
-          </p>
+          
         </div>
       )}
 

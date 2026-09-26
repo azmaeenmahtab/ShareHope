@@ -8,7 +8,7 @@ import { AuthContext } from "../../context/authContext";
 
 async function loginUser({ email, password }) {
 
-  const apiBase = import.meta.env.VITE_API_BASE_URL;
+  const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
   const res = await fetch(apiBase + "/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

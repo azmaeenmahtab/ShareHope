@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const apiBase = import.meta.env.VITE_API_BASE_URL;
+        const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
         const res = await fetch(apiBase + "/api/auth/me", {
           method: "GET",
           headers: { "Content-Type": "application/json" },

@@ -1,7 +1,8 @@
 const { MongoClient } = require('mongodb');
+const path = require('path');
 const dotenv = require('dotenv');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 let client;
 let db;
@@ -10,8 +11,7 @@ const connectDB = async () => {
   const uri = process.env.MONGODB_URI;
 
   if (!uri) {
-    console.warn('WARNING: MONGODB_URI is not set in backend/.env. Please add your connection string.');
-    return null;
+    throw new Error('MONGODB_URI is not set in backend/.env.');
   }
 
   try {
