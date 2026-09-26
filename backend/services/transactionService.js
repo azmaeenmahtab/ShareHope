@@ -109,13 +109,49 @@ async function confirmTransaction(userId, transactionId) {
     {
       _id: new ObjectId(transactionId),
       receiverId: String(userId),
+      status: { $ne: 'confirmed' },
     },
     { $set: { status: 'confirmed', confirmedAt: new Date() } },
     { returnDocument: 'after' }
   );
 
-  if (!result.value) throw new Error('Transaction not found or you cannot confirm it');
-  return serializeTransaction(result.value);
+  const transaction = result && Object.prototype.hasOwnProperty.call(result, 'value')
+    ? result.value
+    : result;
+  if (!transaction) throw new Error('Transaction not found or you cannot confirm it');
+
+  const requestId = String(transaction.requestId || '').trim();
+  const requestLookup = [{ id: requestId }];
+  if (ObjectId.isValid(requestId)) requestLookup.push({ _id: new ObjectId(requestId) });
+
+  const requestResult = await database.collection('requests').findOneAndUpdate(
+    { $or: requestLookup },
+    [
+      {
+        $set: {
+          raised: { $add: [{ $ifNull: ['$raised', 0] }, Number(transaction.amount) || 0] },
+        },
+      },
+      {
+        $set: {
+          percent: {
+            $cond: [
+              { $gt: [{ $ifNull: ['$goal', 0] }, 0] },
+              { $min: [100, { $round: [{ $multiply: [{ $divide: ['$raised', '$goal'] }, 100] }, 0] }] },
+              0,
+            ],
+          },
+        },
+      },
+    ],
+    { returnDocument: 'after' }
+  );
+  const updatedRequest = requestResult && Object.prototype.hasOwnProperty.call(requestResult, 'value')
+    ? requestResult.value
+    : requestResult;
+  if (!updatedRequest) throw new Error('Donation request not found');
+
+  return serializeTransaction(transaction);
 }
 
 module.exports = { getTransactions, createTransaction, confirmTransaction, WALLET_METHODS, normalizeMethod };

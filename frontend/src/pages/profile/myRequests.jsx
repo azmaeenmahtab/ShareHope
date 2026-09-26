@@ -8,6 +8,7 @@ const formatMoney = (value) => `৳ ${Number(value || 0).toLocaleString("en-BD")
 function RequestCard({ request }) {
   const goal = Number(request.goal || 0);
   const raised = Number(request.raised || 0);
+  const remaining = Math.max(goal - raised, 0);
   const percent = goal > 0 ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
 
   return (
@@ -25,7 +26,10 @@ function RequestCard({ request }) {
         </div>
         <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-slate-600">{request.desc}</p>
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-[#3D8D7A]" style={{ width: `${percent}%` }} /></div>
-        <div className="mt-2 flex items-center justify-between text-xs"><span className="font-semibold text-[#0D5C46]">{formatMoney(raised)} raised</span><span className="text-slate-500">of {formatMoney(goal)}</span></div>
+        <div className="mt-2 flex items-center justify-between gap-3 text-xs">
+          <span className="font-semibold text-[#0D5C46]">{formatMoney(raised)} received</span>
+          <span className="text-right text-slate-500">{formatMoney(remaining)} remaining</span>
+        </div>
         <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500"><span>{request.category}</span><span>ID {request.id || "pending"}</span></div>
       </div>
     </article>
@@ -57,6 +61,12 @@ export default function MyRequests() {
 
   useEffect(() => {
     if (user?.email) fetchRequests();
+    window.addEventListener("sharehope:requests-updated", fetchRequests);
+    window.addEventListener("focus", fetchRequests);
+    return () => {
+      window.removeEventListener("sharehope:requests-updated", fetchRequests);
+      window.removeEventListener("focus", fetchRequests);
+    };
   }, [user?.email]);
 
   const filteredRequests = useMemo(() => {

@@ -34,16 +34,22 @@ export default function Navbar() {
       return;
     }
 
-    fetch(`${apiBase}/api/transactions`, { credentials: "include" })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          setNotificationCount((data.transactions || []).filter(
-            (transaction) => transaction.direction === "taken" && transaction.status !== "confirmed"
-          ).length);
-        }
-      })
-      .catch(() => setNotificationCount(0));
+    const refreshNotificationCount = () => {
+      fetch(`${apiBase}/api/transactions`, { credentials: "include" })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            setNotificationCount((data.transactions || []).filter(
+              (transaction) => transaction.direction === "taken" && transaction.status !== "confirmed"
+            ).length);
+          }
+        })
+        .catch(() => setNotificationCount(0));
+    };
+
+    window.addEventListener("sharehope:notifications-updated", refreshNotificationCount);
+    refreshNotificationCount();
+    return () => window.removeEventListener("sharehope:notifications-updated", refreshNotificationCount);
   }, [apiBase, isLoggedIn, location.pathname]);
 
   

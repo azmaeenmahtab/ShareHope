@@ -134,6 +134,12 @@ export default function Requests() {
 
   useEffect(() => {
     fetchRequests();
+    window.addEventListener("sharehope:requests-updated", fetchRequests);
+    window.addEventListener("focus", fetchRequests);
+    return () => {
+      window.removeEventListener("sharehope:requests-updated", fetchRequests);
+      window.removeEventListener("focus", fetchRequests);
+    };
   }, []);
 
   const handleQueryChange = (value) => {
@@ -169,6 +175,10 @@ export default function Requests() {
 
     return dbRequests.filter((item) => {
       const submitterEmail = item.submitterEmail?.trim().toLowerCase();
+
+      if (item.goalNum > 0 && item.raisedNum >= item.goalNum) {
+        return false;
+      }
 
       // A user's own requests belong in their profile, not the public browse feed.
       if (currentUserEmail && submitterEmail === currentUserEmail) {

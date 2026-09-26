@@ -138,7 +138,40 @@ async function getAllRequestsService(filter = {}) {
 
   const collection = database.collection(REQUESTS_COLLECTION);
   const requests = await collection.find(filter).sort({ createdAt: -1 }).toArray();
-  return requests;
+  const requestIds = requests.flatMap((request) => [
+    request.id,
+    request._id?.toString(),
+  ]).filter(Boolean);
+  const confirmedTransactions = requestIds.length
+    ? await database.collection('transactions').find(
+      { status: 'confirmed', requestId: { $in: requestIds } },
+      { projection: { requestId: 1, amount: 1 } }
+    ).toArray()
+    : [];
+  const confirmedRaisedByRequest = new Map();
+
+  for (const transaction of confirmedTransactions) {
+    const requestId = String(transaction.requestId);
+    confirmedRaisedByRequest.set(
+      requestId,
+      (confirmedRaisedByRequest.get(requestId) || 0) + (Number(transaction.amount) || 0)
+    );
+  }
+
+  return requests.map((request) => {
+    const confirmedRaised = Math.max(
+      confirmedRaisedByRequest.get(String(request.id)) || 0,
+      confirmedRaisedByRequest.get(request._id?.toString()) || 0
+    );
+    const raised = Math.max(Number(request.raised) || 0, confirmedRaised);
+    const goal = Number(request.goal) || 0;
+
+    return {
+      ...request,
+      raised,
+      percent: goal > 0 ? Math.min(100, Math.round((raised / goal) * 100)) : 0,
+    };
+  });
 }
 
 module.exports = {

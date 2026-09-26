@@ -16,15 +16,19 @@ export default function Notification() {
     const [loading, setLoading] = useState(true);
     const [confirmingId, setConfirmingId] = useState("");
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     const fetchNotifications = async () => {
         setLoading(true);
         setError("");
+        setSuccess("");
         try {
             const response = await fetch(`${API_BASE_URL}/api/transactions`, { credentials: "include" });
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || "Unable to load notifications");
-            setTransactions((data.transactions || []).filter((transaction) => transaction.direction === "taken"));
+            setTransactions((data.transactions || []).filter(
+                (transaction) => transaction.direction === "taken" && transaction.status !== "confirmed"
+            ));
         } catch (fetchError) {
             setError(fetchError.message || "Unable to load notifications");
         } finally {
@@ -39,6 +43,7 @@ export default function Notification() {
     const confirmReceived = async (transaction) => {
         setConfirmingId(transaction._id);
         setError("");
+        setSuccess("");
         try {
             const response = await fetch(`${API_BASE_URL}/api/transactions/${transaction._id}/confirm`, {
                 method: "PATCH",
@@ -47,9 +52,11 @@ export default function Notification() {
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || "Unable to confirm donation");
 
-            const updated = { ...transaction, ...data.transaction, status: "confirmed" };
-            setTransactions((current) => current.map((item) => item._id === transaction._id ? updated : item));
-            setSelectedTransaction(updated);
+            setTransactions((current) => current.filter((item) => item._id !== transaction._id));
+            setSelectedTransaction(null);
+            setSuccess("Donation confirmed successfully.");
+            window.dispatchEvent(new Event("sharehope:notifications-updated"));
+            window.dispatchEvent(new Event("sharehope:requests-updated"));
         } catch (confirmError) {
             setError(confirmError.message || "Unable to confirm donation");
         } finally {
@@ -84,6 +91,7 @@ export default function Notification() {
                 </div>
 
                 {error && <div role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+                {success && <div role="status" className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{success}</div>}
 
                 {loading ? (
                     <div className="flex items-center justify-center py-24 text-sm text-slate-500">
