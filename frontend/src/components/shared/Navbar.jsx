@@ -26,7 +26,25 @@ export default function Navbar() {
     setMobileOpen(false);
   }, [location.pathname, isLoggedIn]);
 
-const apiBase = import.meta.env.VITE_API_BASE_URL;
+  const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setNotificationCount(0);
+      return;
+    }
+
+    fetch(`${apiBase}/api/transactions`, { credentials: "include" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          setNotificationCount((data.transactions || []).filter(
+            (transaction) => transaction.direction === "taken" && transaction.status !== "confirmed"
+          ).length);
+        }
+      })
+      .catch(() => setNotificationCount(0));
+  }, [apiBase, isLoggedIn, location.pathname]);
 
   
 
@@ -95,16 +113,18 @@ const apiBase = import.meta.env.VITE_API_BASE_URL;
               </div>
             ):isLoggedIn ? (
               <>
-                <button
-                  type="button"
+                <Link
+                  to="/notifications"
                   className="relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#EAF4F0] text-[#0D5C46] transition"
-                  aria-label="Notifications"
+                  aria-label={`Notifications${notificationCount ? `, ${notificationCount} pending` : ""}`}
                 >
                   <Bell className="w-4.5 h-4.5" />
                   {notificationCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#0D5C46]" />
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-bold leading-none text-white">
+                      {notificationCount > 9 ? "9+" : notificationCount}
+                    </span>
                   )}
-                </button>
+                </Link>
 
                 {/* Profile dropdown */}
                 <div className="relative">
@@ -221,6 +241,17 @@ const apiBase = import.meta.env.VITE_API_BASE_URL;
               {link.label}
             </Link>
           ))}
+
+          {isLoggedIn && (
+            <Link
+              to="/notifications"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-[#2D473E] hover:bg-[#EAF4F0] hover:text-[#0D5C46]"
+            >
+              <span className="flex items-center gap-2"><Bell className="h-4 w-4" /> Notifications</span>
+              {notificationCount > 0 && <span className="text-xs font-bold text-rose-600">{notificationCount}</span>}
+            </Link>
+          )}
 
           <div className="pt-3 mt-2 border-t border-[#E5EFEA]">
             {isLoggedIn ? (

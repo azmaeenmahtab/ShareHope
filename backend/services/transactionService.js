@@ -51,8 +51,32 @@ async function createTransaction(userId, payload = {}) {
   const paymentMethod = String(payload.paymentMethod || '').trim();
   const normalizedMethod = normalizeMethod(paymentMethod);
   const purpose = payload.purpose === 'zakat' ? 'zakat' : 'donation';
+  const requestId = String(payload.requestId || '').trim();
 
   if (!paymentMethod) throw new Error('Please provide a payment method');
+  if (direction !== 'given') throw new Error('Donation records must be created by the giver');
+  if (!requestId) throw new Error('Please select a saved donation request');
+
+  const requestLookup = [{ id: requestId }];
+  if (ObjectId.isValid(requestId)) requestLookup.push({ _id: new ObjectId(requestId) });
+  const request = await database.collection('requests').findOne({ $or: requestLookup });
+  if (!request) throw new Error('Donation request not found');
+
+  let receiverId = String(request.submitterId || request.ownerId || request.userId || '');
+  if (!receiverId && request.submitterEmail) {
+    const recipient = await database.collection('user').findOne({
+      email: String(request.submitterEmail).trim().toLowerCase(),
+    });
+    receiverId = recipient?._id?.toString() || '';
+  }
+  if (!receiverId) throw new Error('The donation request owner could not be identified');
+  if (receiverId === String(userId)) throw new Error('You cannot donate to your own request');
+
+  const giverObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
+  const giver = await database.collection('user').findOne(
+    { _id: giverObjectId },
+    { projection: { name: 1 } }
+  );
 
   const transaction = {
     userId: String(userId),
@@ -60,12 +84,15 @@ async function createTransaction(userId, payload = {}) {
     amount,
     purpose,
     paymentMethod,
-    status: String(payload.status || 'pending'),
+    status: 'pending',
     giverId: direction === 'given' ? String(userId) : String(payload.giverId || ''),
-    receiverId: direction === 'taken' ? String(userId) : String(payload.receiverId || ''),
-    requestId: String(payload.requestId || '').trim(),
-    counterpartyId: String(payload.counterpartyId || '').trim(),
-    counterpartyName: String(payload.counterpartyName || 'ShareHope user').trim(),
+    receiverId,
+    requestId,
+    requestName: String(request.name || payload.counterpartyName || 'Donation request'),
+    requestedAmount: Number(request.goal) || 0,
+    giverName: String(giver?.name || 'ShareHope user'),
+    counterpartyId: requestId,
+    counterpartyName: String(request.name || payload.counterpartyName || 'ShareHope user'),
     transactionId: WALLET_METHODS.has(normalizedMethod) ? String(payload.transactionId || '').trim() : '',
     createdAt: new Date(),
   };

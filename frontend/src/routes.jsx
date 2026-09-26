@@ -11,6 +11,7 @@ import TransactionPage from './pages/profile/transaction'
 import MyProfile from './pages/profile/myProfile'
 import MyRequests from './pages/profile/myRequests'
 import ZakatCalculator from './pages/ZakatCalculator'
+import Notification from './pages/Notification'
 
 
 export const router = createBrowserRouter([
@@ -49,6 +50,10 @@ export const router = createBrowserRouter([
       {
         path: '/transaction',
         element: <TransactionPage />,
+      },
+      {
+        path: '/notifications',
+        element: <Notification />,
       },
       {
         path: '/profile',

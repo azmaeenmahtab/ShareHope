@@ -43,6 +43,7 @@ function normalizeRequestPayload(payload = {}) {
   const contactEmail = String(payload.contactEmail || '').trim();
   const relationship = String(payload.relationship || 'Self').trim() || 'Self';
   const submitterEmail = String(payload.submitterEmail || '').trim();
+  const submitterId = String(payload.submitterId || '').trim();
   const methods = [...new Set(normalizeArrayField(payload.methods))];
   const docs = normalizeDocList(payload.docs);
   const image = String(payload.image || '').trim() || DEFAULT_IMAGE;
@@ -92,6 +93,7 @@ function normalizeRequestPayload(payload = {}) {
     contactEmail,
     relationship,
     submitterEmail: submitterEmail || undefined,
+    submitterId: submitterId || undefined,
     verified: false,
     raised: Number.isFinite(Number(payload.raised)) ? Number(payload.raised) : 0,
     percent: Number(goalRaw) > 0 ? Math.min(100, Math.round(((Number.isFinite(Number(payload.raised)) ? Number(payload.raised) : 0) / Number(goalRaw)) * 100)) : 0,

@@ -6,6 +6,7 @@ async function createRequestController(req, res) {
     const payload = {
       ...req.body,
       submitterEmail: req.body?.submitterEmail || req.user?.email || '',
+      submitterId: req.user?.id || '',
     };
 
     const request = await createRequestService(payload);
