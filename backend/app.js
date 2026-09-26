@@ -7,6 +7,7 @@ const authRoute = require('./routes/authRoute');
 const transactionRoute = require('./routes/transactionRoute');
 const userRoute = require('./routes/userRoute');
 const cookieParser = require('cookie-parser');
+const carbonTracker = require('./middlewares/carbonTracker');
 
 const app = express();
 app.use(cookieParser());
@@ -33,6 +34,7 @@ app.use(cors({
 
 
 app.use(express.json());
+app.use(carbonTracker);
 
 // Base Route
 app.get('/', (req, res) => {
