@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, Banknote, HeartHandshake, LoaderCircle, RefreshCw } from "lucide-react";
+import { AuthContext } from "../../context/authContext";
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000").replace(/\/+$/, "");
 const formatMoney =(value)=>`৳ ${Number(value || 0).toLocaleString("en-BD")}`;
 const WALLET_METHODS = new Set(["bkash", "nagad", "rocket"]);
 const TRANSACTIONS_PER_PAGE = 10;
@@ -157,22 +159,40 @@ function TransactionList({ transactions, direction, page, onPageChange, onConfir
 }
 
 export default function TransactionPage() {
+  const { user } = useContext(AuthContext);
   const [transactions, setTransactions] = useState([]);
+  const [ownedRequests, setOwnedRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeView, setActiveView] = useState("given");
   const [currentPages, setCurrentPages] = useState({ given: 1, taken: 1 });
 
+  const fetchOwnedRequests = async () => {
+    if (!user?.email) return;
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/request`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Unable to load your requests");
+      const email = user.email.trim().toLowerCase();
+      setOwnedRequests((data.requests || []).filter(
+        (request) => request.submitterEmail?.trim().toLowerCase() === email
+      ));
+    } catch (fetchError) {
+      setError(fetchError.message || "Unable to load your requests");
+    }
+  };
+
   const confirmReceived = async (transactionId) => {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-      const response = await fetch(`${apiBase}/api/transactions/${transactionId}/confirm`, {
+      const response = await fetch(`${API_BASE_URL}/api/transactions/${transactionId}/confirm`, {
         method: "PATCH",
         credentials: "include",
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Unable to confirm transaction");
       setTransactions((current) => current.map((item) => item._id === transactionId ? { ...item, status: "confirmed" } : item));
+      await fetchOwnedRequests();
+      window.dispatchEvent(new Event("sharehope:notifications-updated"));
     } catch (confirmError) {
       setError(confirmError.message);
     }
@@ -183,8 +203,7 @@ export default function TransactionPage() {
     setError("");
     setCurrentPages({ given: 1, taken: 1 });
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-      const response = await fetch(`${apiBase}/api/transactions`, { credentials: "include" });
+      const response = await fetch(`${API_BASE_URL}/api/transactions`, { credentials: "include" });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Unable to load transactions");
       setTransactions(data.transactions || []);
@@ -197,15 +216,22 @@ export default function TransactionPage() {
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+    fetchOwnedRequests();
+    window.addEventListener("sharehope:requests-updated", fetchOwnedRequests);
+    window.addEventListener("focus", fetchOwnedRequests);
+    return () => {
+      window.removeEventListener("sharehope:requests-updated", fetchOwnedRequests);
+      window.removeEventListener("focus", fetchOwnedRequests);
+    };
+  }, [user?.email]);
 
   const givenTransactions = useMemo(() => transactions.filter((item) => item.direction === "given"), [transactions]);
   const takenTransactions = useMemo(() => transactions.filter((item) => item.direction === "taken"), [transactions]);
   const totalGiven = useMemo(() => givenTransactions.reduce((total, item) => total + Number(item.amount || 0), 0), [givenTransactions]);
   const totalZakatGiven = useMemo(() => givenTransactions.filter((item) => item.purpose === "zakat").reduce((total, item) => total + Number(item.amount || 0), 0), [givenTransactions]);
   const zakatDue = getSavedZakatAmount();
-  const totalTaken = useMemo(() => takenTransactions.reduce((total, item) => total + Number(item.amount || 0), 0), [takenTransactions]);
-  const requestedTotal = useMemo(() => takenTransactions.reduce((total, item) => total + Number(item.requestedAmount || 0), 0), [takenTransactions]);
+  const totalTaken = useMemo(() => ownedRequests.reduce((total, request) => total + Number(request.raised || 0), 0), [ownedRequests]);
+  const requestedTotal = useMemo(() => ownedRequests.reduce((total, request) => total + Number(request.goal || 0), 0), [ownedRequests]);
 
   const changeView = (view) => {
     setActiveView(view);
@@ -270,8 +296,8 @@ export default function TransactionPage() {
                 <ArrowDownLeft className="h-6 w-6 text-[#28627E]" />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
-                <SummaryCard label="Total received" value={totalTaken} detail="Confirmed and pending receipts" tone="blue" icon={ArrowDownLeft} />
-                <SummaryCard label="Amount left" value={Math.max(requestedTotal - totalTaken, 0)} detail={requestedTotal ? `Across recorded request goals: ${formatMoney(requestedTotal)}` : "Request goals will appear with received records"} tone="gold" icon={Banknote} />
+                <SummaryCard label="Total received" value={totalTaken} detail="Confirmed donations across your requests" tone="blue" icon={ArrowDownLeft} />
+                <SummaryCard label="Amount left" value={Math.max(requestedTotal - totalTaken, 0)} detail={requestedTotal ? `Across your request goals: ${formatMoney(requestedTotal)}` : "Create a request to track its donation goal"} tone="gold" icon={Banknote} />
               </div>
               <div className="mt-5"><TransactionList transactions={takenTransactions} direction="taken" page={currentPages.taken} onPageChange={(page) => setCurrentPages((current) => ({ ...current, taken: page }))} onConfirm={confirmReceived} /></div>
             </section>}
